@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>慢病用药小管家 | 首页</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=Noto+Serif+SC:wght@500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-page="dashboard">
+    <div class="ambient-shape"></div>
+
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <a class="brand" href="./index.html">
+          <span class="brand-badge">药</span>
+          <span class="brand-text">
+            <span class="brand-title">慢病用药小管家</span>
+            <span class="brand-sub">问诊后连续管理 Demo</span>
+          </span>
+        </a>
+        <nav class="nav-links">
+          <a class="nav-link active" href="./index.html">首页</a>
+          <a class="nav-link" href="./plan.html">用药计划</a>
+          <a class="nav-link" href="./adherence.html">打卡记录</a>
+          <a class="nav-link" href="./refill.html">续方复诊</a>
+          <a class="nav-link" href="./ai-assist.html">AI 漏服助手</a>
+        </nav>
+        <div class="user-pill">Demo 患者: 王宁 | 高血压 + 糖代谢异常</div>
+      </div>
+    </header>
+
+    <main class="page-wrap">
+      <section class="hero-banner">
+        <div class="hero-main">
+          <p class="hero-kicker">Today-first Workflow</p>
+          <h1 class="hero-title">今天该做什么，一眼看清</h1>
+          <p class="hero-summary">
+            以“下一次服药”为核心入口，把提醒、打卡、库存和复诊准备压缩成一条清晰路径。打开即能演示完整闭环，不依赖登录。
+          </p>
+          <form id="home-search-form" class="home-search" role="search" aria-label="药物与功能搜索">
+            <div class="home-search-row">
+              <input
+                id="home-search-input"
+                type="search"
+                placeholder="搜索药物或功能，如 二甲双胍、库存预警、漏服补救"
+                list="home-search-list"
+                autocomplete="off"
+              />
+              <button class="btn-light" type="submit">搜索</button>
+            </div>
+            <datalist id="home-search-list">
+              <option value="二甲双胍"></option>
+              <option value="缬沙坦"></option>
+              <option value="阿托伐他汀"></option>
+              <option value="氨氯地平"></option>
+              <option value="库存预警"></option>
+              <option value="用药计划"></option>
+              <option value="续方复诊"></option>
+              <option value="漏服补救"></option>
+              <option value="长辈模式"></option>
+              <option value="辅助功能"></option>
+            </datalist>
+            <p class="search-label">搜索建议</p>
+            <div id="home-search-suggest" class="home-search-suggest"></div>
+            <p id="home-search-results" class="home-search-results" hidden></p>
+          </form>
+          <div class="hero-chips">
+            <span class="chip">今日任务自动聚焦</span>
+            <span class="chip">漏服可一键补救</span>
+            <span class="chip">库存提前预警续方</span>
+          </div>
+          <div class="panel-tools" style="margin-top: 22px">
+            <button class="btn" data-action="mock-upload">导入并解析处方</button>
+            <button class="btn-ghost" data-action="mock-summary">预览复诊摘要</button>
+          </div>
+        </div>
+
+        <aside class="hero-side">
+          <p class="section-kicker">下一次服药</p>
+          <h2>19:30</h2>
+          <strong>阿托伐他汀 20mg</strong>
+          <p class="muted">
+            今日完成 <b data-bind="dose-summary">0 / 0</b>，依从率 <b data-bind="dose-ratio">0%</b>
+          </p>
+          <div class="progress-wrap">
+            <div class="progress-label">
+              <span>今日执行进度</span>
+              <span data-bind="dose-ratio">0%</span>
+            </div>
+            <div class="progress"><span data-bind="dose-progress" style="width: 0%"></span></div>
+          </div>
+          <div class="panel-tools">
+            <button class="btn-light" data-action="mock-remind">稍后提醒 20 分钟</button>
+            <a class="btn-ghost" href="./ai-assist.html" style="text-decoration: none; display: inline-flex; align-items: center">漏服补救</a>
+          </div>
+        </aside>
+      </section>
+
+      <section class="layout-grid fade-seq">
+        <article class="panel span-8 dashboard-core-panel">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">Medication Timeline</p>
+              <h3 class="panel-title">今日时间轴</h3>
+            </div>
+            <span class="pill">自动同步到打卡记录页</span>
+          </header>
+
+          <div class="timeline">
+            <div class="dose-item" data-dose-id="d0730">
+              <div class="dose-time">07:30</div>
+              <div>
+                <p class="dose-name">二甲双胍 500mg</p>
+                <p class="dose-meta">早餐后 · 控制血糖</p>
+              </div>
+              <button class="btn" data-action="toggle-dose">标记服用</button>
+            </div>
+
+            <div class="dose-item" data-dose-id="d1230">
+              <div class="dose-time">12:30</div>
+              <div>
+                <p class="dose-name">缬沙坦 80mg</p>
+                <p class="dose-meta">午餐后 · 稳定血压</p>
+              </div>
+              <button class="btn" data-action="toggle-dose">标记服用</button>
+            </div>
+
+            <div class="dose-item next" data-dose-id="d1930">
+              <div class="dose-time">19:30</div>
+              <div>
+                <p class="dose-name">阿托伐他汀 20mg</p>
+                <p class="dose-meta">晚餐后 · 降脂方案</p>
+              </div>
+              <button class="btn" data-action="toggle-dose">标记服用</button>
+            </div>
+
+            <div class="dose-item" data-dose-id="d2200">
+              <div class="dose-time">22:00</div>
+              <div>
+                <p class="dose-name">氨氯地平 5mg</p>
+                <p class="dose-meta">睡前 · 长效降压</p>
+              </div>
+              <button class="btn" data-action="toggle-dose">标记服用</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel span-4 dashboard-inventory-panel">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">Refill Risk</p>
+              <h3 class="panel-title">库存预警</h3>
+            </div>
+          </header>
+          <div class="stack">
+            <div class="info-card warn">
+              <p class="info-title">缬沙坦</p>
+              <p class="info-value">剩余 4 天</p>
+              <p class="info-meta">建议 2 天内续方，避免治疗中断</p>
+            </div>
+            <div class="info-card">
+              <p class="info-title">二甲双胍</p>
+              <p class="info-value">剩余 11 天</p>
+              <p class="info-meta">库存稳定，本周无需处理</p>
+            </div>
+            <a class="btn-light" href="./refill.html" style="text-decoration: none; display: inline-flex; justify-content: center; align-items: center">进入续方复诊页</a>
+          </div>
+        </article>
+
+        <article class="panel span-4 dashboard-optional-panel dashboard-analytics-panel">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">Daily Snapshot</p>
+              <h3 class="panel-title">今日总览</h3>
+            </div>
+          </header>
+          <div class="metric-row" style="grid-template-columns: repeat(2, minmax(0, 1fr))">
+            <div class="metric-card">
+              <p class="metric-label">服药完成</p>
+              <p class="metric-value" data-bind="dose-summary">0 / 0</p>
+              <p class="metric-sub">按时执行率</p>
+            </div>
+            <div class="metric-card">
+              <p class="metric-label">依从率</p>
+              <p class="metric-value" data-bind="dose-ratio">0%</p>
+              <p class="metric-sub">近 7 天稳定</p>
+            </div>
+          </div>
+          <p class="footer-note">高频操作尽量保持一键完成，减少患者操作负担。</p>
+        </article>
+
+        <article class="panel span-8 dashboard-optional-panel dashboard-followup-panel">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">Follow-up Readiness</p>
+              <h3 class="panel-title">复诊前准备</h3>
+            </div>
+            <span class="badge warn">下次复诊 2026-05-03</span>
+          </header>
+          <div class="list-grid">
+            <div class="list-item">
+              <h4>已自动汇总近 7 天数据</h4>
+              <p>包含服药完成率、漏服情况、症状记录和库存风险标签。</p>
+            </div>
+            <div class="list-item">
+              <h4>可生成复诊沟通摘要</h4>
+              <p>用于医生快速理解患者最近执行状态，减少复诊沟通成本。</p>
+            </div>
+          </div>
+          <div class="panel-tools" style="margin-top: 14px">
+            <button class="btn-light" data-action="mock-summary">生成摘要</button>
+            <a class="btn-ghost" href="./adherence.html" style="text-decoration: none; display: inline-flex; align-items: center">查看打卡细节</a>
+          </div>
+        </article>
+      </section>
+
+      <p class="footer-note">
+        Demo 模式: 数据仅保存在当前浏览器，适合考核演示。<span data-bind="year"></span>
+      </p>
+    </main>
+
+    <div id="toast-container" style="position: fixed; right: 18px; bottom: 18px; z-index: 100"></div>
+    <script src="./script.js"></script>
+  </body>
+</html>

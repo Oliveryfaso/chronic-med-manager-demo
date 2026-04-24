@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>慢病用药小管家 | 打卡记录</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=Noto+Serif+SC:wght@500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-page="adherence">
+    <div class="ambient-shape"></div>
+
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <a class="brand" href="./index.html">
+          <span class="brand-badge">药</span>
+          <span class="brand-text">
+            <span class="brand-title">慢病用药小管家</span>
+            <span class="brand-sub">问诊后连续管理 Demo</span>
+          </span>
+        </a>
+        <nav class="nav-links">
+          <a class="nav-link" href="./index.html">首页</a>
+          <a class="nav-link" href="./plan.html">用药计划</a>
+          <a class="nav-link active" href="./adherence.html">打卡记录</a>
+          <a class="nav-link" href="./refill.html">续方复诊</a>
+          <a class="nav-link" href="./ai-assist.html">AI 漏服助手</a>
+        </nav>
+        <div class="user-pill">记录保存: 当前浏览器本地</div>
+      </div>
+    </header>
+
+    <main class="page-wrap">
+      <section class="hero-banner">
+        <div class="hero-main">
+          <p class="hero-kicker">Adherence Tracking</p>
+          <h1 class="hero-title">打卡不只是勾选，更是风险前置</h1>
+          <p class="hero-summary">
+            这里把服药完成率、漏服位置和症状变化放在一起，形成可解释的依从性记录。复诊时可直接转为摘要，减少主观回忆偏差。
+          </p>
+          <div class="hero-chips">
+            <span class="chip">一键记录服药</span>
+            <span class="chip">症状备注本地持久化</span>
+            <span class="chip">趋势可视化展示</span>
+          </div>
+        </div>
+        <aside class="hero-side">
+          <p class="section-kicker">今日执行概览</p>
+          <h2 data-bind="dose-ratio">0%</h2>
+          <strong data-bind="dose-summary">0 / 0</strong>
+          <p class="muted">与首页联动，勾选结果会实时更新。</p>
+          <div class="progress"><span data-bind="dose-progress" style="width: 0%"></span></div>
+        </aside>
+      </section>
+
+      <section class="layout-grid fade-seq">
+        <article class="panel span-8">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">Today Checklist</p>
+              <h3 class="panel-title">今日打卡清单</h3>
+            </div>
+            <span class="pill">可用于回访复盘</span>
+          </header>
+
+          <div class="timeline">
+            <div class="dose-item" data-dose-id="adh_0800">
+              <div class="dose-time">08:00</div>
+              <div>
+                <p class="dose-name">二甲双胍 500mg</p>
+                <p class="dose-meta">早餐后 · 建议与进食绑定提醒</p>
+              </div>
+              <button class="btn" data-action="toggle-dose">标记服用</button>
+            </div>
+
+            <div class="dose-item" data-dose-id="adh_1200">
+              <div class="dose-time">12:00</div>
+              <div>
+                <p class="dose-name">缬沙坦 80mg</p>
+                <p class="dose-meta">午餐后 · 稳定血压</p>
+              </div>
+              <button class="btn" data-action="toggle-dose">标记服用</button>
+            </div>
+
+            <div class="dose-item" data-dose-id="adh_1830">
+              <div class="dose-time">18:30</div>
+              <div>
+                <p class="dose-name">阿托伐他汀 20mg</p>
+                <p class="dose-meta">晚餐后 · 近期出现一次漏服</p>
+              </div>
+              <button class="btn" data-action="toggle-dose">标记服用</button>
+            </div>
+
+            <div class="dose-item" data-dose-id="adh_2200">
+              <div class="dose-time">22:00</div>
+              <div>
+                <p class="dose-name">氨氯地平 5mg</p>
+                <p class="dose-meta">睡前 · 可与睡前流程绑定</p>
+              </div>
+              <button class="btn" data-action="toggle-dose">标记服用</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel span-4">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">7-Day Trend</p>
+              <h3 class="panel-title">依从率趋势</h3>
+            </div>
+          </header>
+
+          <div class="data-bars">
+            <div class="data-bar">
+              <b>周一</b>
+              <div><i style="width: 100%"></i></div>
+              <span>100%</span>
+            </div>
+            <div class="data-bar">
+              <b>周二</b>
+              <div><i style="width: 75%"></i></div>
+              <span>75%</span>
+            </div>
+            <div class="data-bar">
+              <b>周三</b>
+              <div><i style="width: 100%"></i></div>
+              <span>100%</span>
+            </div>
+            <div class="data-bar">
+              <b>周四</b>
+              <div><i style="width: 75%"></i></div>
+              <span>75%</span>
+            </div>
+            <div class="data-bar">
+              <b>周五</b>
+              <div><i style="width: 90%"></i></div>
+              <span>90%</span>
+            </div>
+          </div>
+
+          <p class="footer-note">连续漏服集中在晚间，建议开启家属协助提醒。</p>
+        </article>
+
+        <article class="panel span-6">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">Symptom Input</p>
+              <h3 class="panel-title">症状记录</h3>
+            </div>
+          </header>
+
+          <form id="symptom-form" class="form-grid">
+            <div class="field full">
+              <label for="symptom-content">今天的症状/变化</label>
+              <textarea id="symptom-content" placeholder="示例: 傍晚轻微头晕，持续约 10 分钟"></textarea>
+            </div>
+            <div class="field">
+              <label for="symptom-severity">程度</label>
+              <select id="symptom-severity">
+                <option value="轻度">轻度</option>
+                <option value="中度">中度</option>
+                <option value="重度">重度</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="symptom-tag">场景标签</label>
+              <select id="symptom-tag">
+                <option>服药后 2 小时内</option>
+                <option>运动后</option>
+                <option>餐前</option>
+                <option>夜间</option>
+              </select>
+            </div>
+            <div class="field full">
+              <button class="btn" type="submit">保存症状记录</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="panel span-6">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">Recent Notes</p>
+              <h3 class="panel-title">近期备注</h3>
+            </div>
+            <button class="btn-ghost" data-action="mock-summary">生成复诊摘要</button>
+          </header>
+
+          <div id="symptom-note-list" class="note-list"></div>
+        </article>
+      </section>
+
+      <p class="footer-note">症状与服药记录同步保存，复诊沟通会更有依据。<span data-bind="year"></span></p>
+    </main>
+
+    <div id="toast-container" style="position: fixed; right: 18px; bottom: 18px; z-index: 100"></div>
+    <script src="./script.js"></script>
+  </body>
+</html>

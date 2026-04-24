@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>慢病用药小管家 | 续方复诊</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=Noto+Serif+SC:wght@500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-page="refill">
+    <div class="ambient-shape"></div>
+
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <a class="brand" href="./index.html">
+          <span class="brand-badge">药</span>
+          <span class="brand-text">
+            <span class="brand-title">慢病用药小管家</span>
+            <span class="brand-sub">问诊后连续管理 Demo</span>
+          </span>
+        </a>
+        <nav class="nav-links">
+          <a class="nav-link" href="./index.html">首页</a>
+          <a class="nav-link" href="./plan.html">用药计划</a>
+          <a class="nav-link" href="./adherence.html">打卡记录</a>
+          <a class="nav-link active" href="./refill.html">续方复诊</a>
+          <a class="nav-link" href="./ai-assist.html">AI 漏服助手</a>
+        </nav>
+        <div class="user-pill">复诊窗口: 9 天后</div>
+      </div>
+    </header>
+
+    <main class="page-wrap">
+      <section class="hero-banner">
+        <div class="hero-main">
+          <p class="hero-kicker">Refill + Follow-up</p>
+          <h1 class="hero-title">不断药，也不临时抱佛脚</h1>
+          <p class="hero-summary">
+            把“库存还剩几天”和“复诊前要准备什么”放在同一页面，让续方与复诊不再割裂。页面中的建议日期会按当天自动计算，方便演示实时性。
+          </p>
+          <div class="hero-chips">
+            <span class="chip">库存天数实时估算</span>
+            <span class="chip">推荐续方日期</span>
+            <span class="chip">复诊摘要一键生成</span>
+          </div>
+        </div>
+        <aside class="hero-side">
+          <p class="section-kicker">最近风险药品</p>
+          <h2>缬沙坦</h2>
+          <strong>仅剩 4 天</strong>
+          <p class="muted">建议优先续方，避免中断导致血压波动。</p>
+          <button id="calc-refill-btn" class="btn-light">重新计算续方日期</button>
+        </aside>
+      </section>
+
+      <section class="layout-grid fade-seq">
+        <article class="panel span-8">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">Stock Forecast</p>
+              <h3 class="panel-title">续方建议</h3>
+            </div>
+            <span class="badge warn">动态日期按当前时间计算</span>
+          </header>
+
+          <div class="stack">
+            <div class="section-card" data-refill-days="4">
+              <div class="panel-head" style="margin-bottom: 10px">
+                <strong>缬沙坦 80mg</strong>
+                <span class="badge warn">高优先级</span>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-label">
+                  <span>剩余库存</span>
+                  <span>4 天</span>
+                </div>
+                <div class="progress"><span style="width: 24%"></span></div>
+              </div>
+              <p class="info-meta">建议最晚续方日期: <b data-bind="refill-date">--</b></p>
+              <p class="info-meta" data-bind="refill-caution">--</p>
+            </div>
+
+            <div class="section-card" data-refill-days="9">
+              <div class="panel-head" style="margin-bottom: 10px">
+                <strong>阿托伐他汀 20mg</strong>
+                <span class="badge ok">中优先级</span>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-label">
+                  <span>剩余库存</span>
+                  <span>9 天</span>
+                </div>
+                <div class="progress"><span style="width: 54%"></span></div>
+              </div>
+              <p class="info-meta">建议最晚续方日期: <b data-bind="refill-date">--</b></p>
+              <p class="info-meta" data-bind="refill-caution">--</p>
+            </div>
+
+            <div class="section-card" data-refill-days="13">
+              <div class="panel-head" style="margin-bottom: 10px">
+                <strong>二甲双胍 500mg</strong>
+                <span class="badge ok">低优先级</span>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-label">
+                  <span>剩余库存</span>
+                  <span>13 天</span>
+                </div>
+                <div class="progress"><span style="width: 74%"></span></div>
+              </div>
+              <p class="info-meta">建议最晚续方日期: <b data-bind="refill-date">--</b></p>
+              <p class="info-meta" data-bind="refill-caution">--</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel span-4">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">Follow-up</p>
+              <h3 class="panel-title">复诊节点</h3>
+            </div>
+          </header>
+          <div class="stack">
+            <div class="info-card">
+              <p class="info-title">下次复诊日期</p>
+              <p class="info-value">2026-05-03</p>
+              <p class="info-meta">建议提前 3 天完成续方与记录整理</p>
+            </div>
+            <div class="info-card">
+              <p class="info-title">需准备材料</p>
+              <p class="info-meta">近 7 天依从率、症状记录、血压血糖趋势、漏服说明</p>
+            </div>
+            <button class="btn" data-action="mock-summary">生成复诊摘要</button>
+          </div>
+        </article>
+
+        <article class="panel span-6">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">Family Support</p>
+              <h3 class="panel-title">家属协同提醒</h3>
+            </div>
+          </header>
+
+          <div class="list-grid">
+            <div class="list-item">
+              <h4>晚间连续漏服监测</h4>
+              <p>连续 2 次漏服时向家属发送提醒，优先介入高风险时段。</p>
+            </div>
+            <div class="list-item">
+              <h4>库存预警同步</h4>
+              <p>库存低于 5 天自动共享给家属，避免患者独自承担续方记忆负担。</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel span-6">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">Action Pack</p>
+              <h3 class="panel-title">复诊前动作包</h3>
+            </div>
+          </header>
+
+          <div class="stack">
+            <div class="tool-card">
+              <p class="info-title">1. 检查库存最低药</p>
+              <p class="info-meta">优先处理剩余天数最短药品，避免断药。</p>
+            </div>
+            <div class="tool-card">
+              <p class="info-title">2. 整理近期症状</p>
+              <p class="info-meta">突出首次出现、持续时间、与服药时机关系。</p>
+            </div>
+            <div class="tool-card">
+              <p class="info-title">3. 生成复诊摘要</p>
+              <p class="info-meta">让医生快速看到执行情况与风险点。</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <p class="footer-note">续方和复诊在同页联动，能显著降低“知道要续却忘了做”的断层。<span data-bind="year"></span></p>
+    </main>
+
+    <div id="toast-container" style="position: fixed; right: 18px; bottom: 18px; z-index: 100"></div>
+    <script src="./script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>慢病用药小管家 | 用药计划</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=Noto+Serif+SC:wght@500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-page="plan">
+    <div class="ambient-shape"></div>
+
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <a class="brand" href="./index.html">
+          <span class="brand-badge">药</span>
+          <span class="brand-text">
+            <span class="brand-title">慢病用药小管家</span>
+            <span class="brand-sub">问诊后连续管理 Demo</span>
+          </span>
+        </a>
+        <nav class="nav-links">
+          <a class="nav-link" href="./index.html">首页</a>
+          <a class="nav-link active" href="./plan.html">用药计划</a>
+          <a class="nav-link" href="./adherence.html">打卡记录</a>
+          <a class="nav-link" href="./refill.html">续方复诊</a>
+          <a class="nav-link" href="./ai-assist.html">AI 漏服助手</a>
+        </nav>
+        <div class="user-pill">计划版本: 2026-Q2 Demo</div>
+      </div>
+    </header>
+
+    <main class="page-wrap">
+      <section class="hero-banner">
+        <div class="hero-main">
+          <p class="hero-kicker">Medication Plan</p>
+          <h1 class="hero-title">药单清楚，执行就不会乱</h1>
+          <p class="hero-summary">
+            这页负责把处方语言转成可执行计划，核心是“药名 + 时间 + 用法 + 注意事项”四要素。新增药物与调整计划都保留在同一视图内，减少来回跳转。
+          </p>
+          <div class="hero-chips">
+            <span class="chip">按餐前后自动分类</span>
+            <span class="chip">支持处方解析导入</span>
+            <span class="chip">可手动精调频次</span>
+          </div>
+        </div>
+        <aside class="hero-side">
+          <p class="section-kicker">本周用药总量</p>
+          <h2>28 次</h2>
+          <strong>当前方案稳定</strong>
+          <p class="muted">最近 14 天无重大方案变更，建议维持执行并关注库存提醒。</p>
+        </aside>
+      </section>
+
+      <section class="layout-grid fade-seq">
+        <article class="panel span-8">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">Active Medicines</p>
+              <h3 class="panel-title">当前药物清单</h3>
+            </div>
+            <div class="panel-tools">
+              <button class="btn" data-action="mock-upload">智能导入处方</button>
+              <button class="btn-ghost">手动补充药物</button>
+            </div>
+          </header>
+
+          <div style="overflow-x: auto">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>药物</th>
+                  <th>剂量</th>
+                  <th>频次</th>
+                  <th>服用时机</th>
+                  <th>重点提醒</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>二甲双胍</strong>
+                    <span>Metformin</span>
+                  </td>
+                  <td>500mg</td>
+                  <td>每日 2 次</td>
+                  <td>早餐后 / 晚餐后</td>
+                  <td><span>避免空腹服用，关注胃部反应</span></td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>缬沙坦</strong>
+                    <span>Valsartan</span>
+                  </td>
+                  <td>80mg</td>
+                  <td>每日 1 次</td>
+                  <td>午餐后</td>
+                  <td><span>固定时段执行，避免漏服</span></td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>阿托伐他汀</strong>
+                    <span>Atorvastatin</span>
+                  </td>
+                  <td>20mg</td>
+                  <td>每日 1 次</td>
+                  <td>晚餐后</td>
+                  <td><span>夜间服用更利于依从</span></td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>氨氯地平</strong>
+                    <span>Amlodipine</span>
+                  </td>
+                  <td>5mg</td>
+                  <td>每日 1 次</td>
+                  <td>睡前</td>
+                  <td><span>注意头晕、低血压反应</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel span-4">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">AI Parse</p>
+              <h3 class="panel-title">处方解析输入</h3>
+            </div>
+          </header>
+          <div class="stack">
+            <div class="tool-card">
+              <p class="info-title">上传处方图片</p>
+              <p class="info-meta">自动提取药名、频次、剂量、餐前后规则。</p>
+              <button class="btn-light" style="margin-top: 10px" data-action="mock-upload">上传并识别</button>
+            </div>
+            <div class="tool-card">
+              <p class="info-title">粘贴医生医嘱文本</p>
+              <p class="info-meta">可直接生成结构化计划并校验潜在冲突。</p>
+              <textarea placeholder="示例: 缬沙坦 80mg 每日一次，午餐后服用"></textarea>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel span-12">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">Daily Matrix</p>
+              <h3 class="panel-title">一日执行矩阵</h3>
+            </div>
+            <span class="badge ok">保持固定节奏可降低漏服</span>
+          </header>
+          <div class="list-grid">
+            <div class="list-item">
+              <h4>早餐后 07:30</h4>
+              <p>二甲双胍 500mg · 搭配进食，避免胃肠不适。</p>
+            </div>
+            <div class="list-item">
+              <h4>午餐后 12:30</h4>
+              <p>缬沙坦 80mg · 建议固定餐后 30 分钟内完成。</p>
+            </div>
+            <div class="list-item">
+              <h4>晚餐后 19:30</h4>
+              <p>阿托伐他汀 20mg + 二甲双胍 500mg · 可合并提醒，减少遗漏。</p>
+            </div>
+            <div class="list-item">
+              <h4>睡前 22:00</h4>
+              <p>氨氯地平 5mg · 建议与睡前洗漱绑定为固定动作。</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <p class="footer-note">计划页目标: 清楚、可执行、可调整，而不是信息堆叠。<span data-bind="year"></span></p>
+    </main>
+
+    <div id="toast-container" style="position: fixed; right: 18px; bottom: 18px; z-index: 100"></div>
+    <script src="./script.js"></script>
+  </body>
+</html>
