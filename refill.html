@@ -31,7 +31,27 @@
           <a class="nav-link active" href="./refill.html">续方复诊</a>
           <a class="nav-link" href="./ai-assist.html">AI 漏服助手</a>
         </nav>
-        <div class="user-pill">复诊窗口: 9 天后</div>
+        <form id="home-search-form" class="home-search nav-search" role="search" aria-label="药物与功能搜索">
+          <div class="home-search-row">
+            <input id="home-search-input" type="search" placeholder="搜索药物或功能" list="home-search-list" autocomplete="off" />
+            <button class="btn-light" type="submit">搜索</button>
+          </div>
+          <datalist id="home-search-list">
+            <option value="二甲双胍"></option>
+            <option value="缬沙坦"></option>
+            <option value="阿托伐他汀"></option>
+            <option value="氨氯地平"></option>
+            <option value="库存预警"></option>
+            <option value="用药计划"></option>
+            <option value="续方复诊"></option>
+            <option value="漏服补救"></option>
+            <option value="长辈模式"></option>
+            <option value="辅助功能"></option>
+          </datalist>
+          <p class="search-label">搜索建议</p>
+          <div id="home-search-suggest" class="home-search-suggest"></div>
+          <p id="home-search-results" class="home-search-results" hidden></p>
+        </form>
       </div>
     </header>
 
@@ -39,7 +59,7 @@
       <section class="hero-banner">
         <div class="hero-main">
           <p class="hero-kicker">Refill + Follow-up</p>
-          <h1 class="hero-title">不断药，也不临时抱佛脚</h1>
+          <h1 class="hero-title">不断药，不临时抱佛脚</h1>
           <p class="hero-summary">
             把“库存还剩几天”和“复诊前要准备什么”放在同一页面，让续方与复诊不再割裂。页面中的建议日期会按当天自动计算，方便演示实时性。
           </p>
@@ -83,6 +103,7 @@
               </div>
               <p class="info-meta">建议最晚续方日期: <b data-bind="refill-date">--</b></p>
               <p class="info-meta" data-bind="refill-caution">--</p>
+              <div data-risk-med="valsartan"></div>
             </div>
 
             <div class="section-card" data-refill-days="9">
@@ -99,6 +120,7 @@
               </div>
               <p class="info-meta">建议最晚续方日期: <b data-bind="refill-date">--</b></p>
               <p class="info-meta" data-bind="refill-caution">--</p>
+              <div data-risk-med="atorvastatin"></div>
             </div>
 
             <div class="section-card" data-refill-days="13">
@@ -115,6 +137,7 @@
               </div>
               <p class="info-meta">建议最晚续方日期: <b data-bind="refill-date">--</b></p>
               <p class="info-meta" data-bind="refill-caution">--</p>
+              <div data-risk-med="metformin"></div>
             </div>
           </div>
         </article>
@@ -140,6 +163,17 @@
           </div>
         </article>
 
+        <article class="panel span-12">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">Risk Window</p>
+              <h3 class="panel-title">断药风险窗口</h3>
+            </div>
+            <span class="badge warn">结合复诊日期判断</span>
+          </header>
+          <div data-bind="refill-risk-window"></div>
+        </article>
+
         <article class="panel span-6">
           <header class="panel-head">
             <div>
@@ -158,6 +192,7 @@
               <p>库存低于 5 天自动共享给家属，避免患者独自承担续方记忆负担。</p>
             </div>
           </div>
+          <div data-bind="caregiver-summary" style="margin-top: 14px"></div>
         </article>
 
         <article class="panel span-6">
@@ -182,6 +217,7 @@
               <p class="info-meta">让医生快速看到执行情况与风险点。</p>
             </div>
           </div>
+          <div data-bind="visit-summary" hidden style="margin-top: 14px"></div>
         </article>
       </section>
 

@@ -4,12 +4,14 @@ const ACCESS_KEY = "chronic-med-manager-accessibility-v1";
 const defaultState = {
   doseChecks: {
     d0730: true,
+    adh_0730: true,
     d1230: true,
+    adh_1230: true,
     d1930: false,
+    adh_1930: false,
+    d1930_metformin: false,
+    adh_1930_metformin: false,
     d2200: false,
-    adh_0800: true,
-    adh_1200: true,
-    adh_1830: false,
     adh_2200: false
   },
   notes: [
@@ -52,6 +54,73 @@ const defaultAccessibility = {
     }
   ]
 };
+
+const CARE_PROFILE = {
+  name: "王宁",
+  age: 67,
+  conditions: ["高血压", "糖代谢异常", "血脂偏高"],
+  routine: "晚餐后和睡前容易被家务、看电视打断",
+  followUpDate: "2026-05-03",
+  refillLeadDays: 3
+};
+
+const MEDICATIONS = [
+  {
+    id: "metformin",
+    name: "二甲双胍",
+    english: "Metformin",
+    dose: "500mg",
+    frequency: "每日 2 次",
+    purpose: "控制血糖",
+    timing: "早餐后 / 晚餐后",
+    caution: "避免空腹服用，关注胃部反应",
+    stockDays: 13,
+    doses: [
+      { id: "d0730", pairedId: "adh_0730", time: "07:30", label: "早餐后", meta: "搭配进食，减少胃肠不适" },
+      { id: "d1930_metformin", pairedId: "adh_1930_metformin", time: "19:30", label: "晚餐后", meta: "与晚餐绑定提醒，减少遗漏" }
+    ]
+  },
+  {
+    id: "valsartan",
+    name: "缬沙坦",
+    english: "Valsartan",
+    dose: "80mg",
+    frequency: "每日 1 次",
+    purpose: "稳定血压",
+    timing: "午餐后",
+    caution: "固定时段执行，避免漏服",
+    stockDays: 4,
+    doses: [{ id: "d1230", pairedId: "adh_1230", time: "12:30", label: "午餐后", meta: "建议固定餐后 30 分钟内完成" }]
+  },
+  {
+    id: "atorvastatin",
+    name: "阿托伐他汀",
+    english: "Atorvastatin",
+    dose: "20mg",
+    frequency: "每日 1 次",
+    purpose: "降脂方案",
+    timing: "晚餐后",
+    caution: "夜间服用更利于依从",
+    stockDays: 9,
+    doses: [{ id: "d1930", pairedId: "adh_1930", time: "19:30", label: "晚餐后", meta: "可与二甲双胍合并提醒" }]
+  },
+  {
+    id: "amlodipine",
+    name: "氨氯地平",
+    english: "Amlodipine",
+    dose: "5mg",
+    frequency: "每日 1 次",
+    purpose: "长效降压",
+    timing: "睡前",
+    caution: "注意头晕、低血压反应",
+    stockDays: 16,
+    doses: [{ id: "d2200", pairedId: "adh_2200", time: "22:00", label: "睡前", meta: "建议与睡前洗漱绑定" }]
+  }
+];
+
+const DOSE_ID_ALIASES = MEDICATIONS.flatMap((med) =>
+  med.doses.map((dose) => [dose.id, dose.pairedId]).filter((pair) => pair[0] && pair[1])
+);
 
 const emergencyRuntime = {
   active: false,
@@ -180,13 +249,24 @@ function formatPhoneDisplay(value) {
 
 function readState() {
   const parsed = readJsonStorage(STATE_KEY, defaultState);
+  const doseChecks = {
+    ...deepClone(defaultState).doseChecks,
+    ...(parsed.doseChecks || {})
+  };
+
+  DOSE_ID_ALIASES.forEach(([primaryId, pairedId]) => {
+    const saved = parsed.doseChecks || {};
+    if (Object.prototype.hasOwnProperty.call(saved, primaryId) || Object.prototype.hasOwnProperty.call(saved, pairedId)) {
+      const value = Boolean(Object.prototype.hasOwnProperty.call(saved, primaryId) ? saved[primaryId] : saved[pairedId]);
+      doseChecks[primaryId] = value;
+      doseChecks[pairedId] = value;
+    }
+  });
+
   return {
     ...deepClone(defaultState),
     ...parsed,
-    doseChecks: {
-      ...deepClone(defaultState).doseChecks,
-      ...(parsed.doseChecks || {})
-    },
+    doseChecks,
     notes: Array.isArray(parsed.notes) ? parsed.notes : deepClone(defaultState).notes
   };
 }
@@ -241,6 +321,74 @@ function formatTime(input) {
 
 function formatDateTime(input) {
   return `${formatDate(input)} ${formatTime(input)}`;
+}
+
+function addDays(input, days) {
+  const d = new Date(input);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+
+function getAllDoseIds(kind = "home") {
+  return MEDICATIONS.flatMap((med) =>
+    med.doses.map((dose) => (kind === "adherence" ? dose.pairedId : dose.id)).filter(Boolean)
+  );
+}
+
+function findMedicationByDoseId(doseId) {
+  for (const med of MEDICATIONS) {
+    const dose = med.doses.find((item) => item.id === doseId || item.pairedId === doseId);
+    if (dose) return { med, dose };
+  }
+  return null;
+}
+
+function getDoseAliases(doseId) {
+  const pair = DOSE_ID_ALIASES.find(([a, b]) => a === doseId || b === doseId);
+  return pair || [doseId];
+}
+
+function setDoseCheck(doseId, checked) {
+  getDoseAliases(doseId).forEach((id) => {
+    state.doseChecks[id] = checked;
+  });
+}
+
+function isDoseChecked(doseId) {
+  return getDoseAliases(doseId).some((id) => Boolean(state.doseChecks[id]));
+}
+
+function getAdherenceSnapshot() {
+  const ids = getAllDoseIds("home");
+  const done = ids.filter((id) => isDoseChecked(id)).length;
+  const total = ids.length;
+  const ratio = total ? Math.round((done / total) * 100) : 0;
+  const missed = ids
+    .filter((id) => !isDoseChecked(id))
+    .map((id) => findMedicationByDoseId(id))
+    .filter(Boolean);
+  const eveningMissed = missed.filter(({ dose }) => parseHourMinute(dose.time) >= 18 * 60).length;
+
+  return { ids, done, total, ratio, missed, eveningMissed };
+}
+
+function getLowestStockMedicine() {
+  return MEDICATIONS.slice().sort((a, b) => a.stockDays - b.stockDays)[0];
+}
+
+function getRefillRiskInfo(med) {
+  const now = new Date();
+  const runOutDate = addDays(now, med.stockDays);
+  const latestRefillDate = addDays(now, Math.max(1, med.stockDays - (med.stockDays <= 5 ? 1 : CARE_PROFILE.refillLeadDays)));
+  const followUpDate = new Date(`${CARE_PROFILE.followUpDate}T00:00:00+08:00`);
+  const gapDays = Math.ceil((followUpDate - runOutDate) / 86400000);
+  const priority = med.stockDays <= 5 ? "高优先级" : med.stockDays <= 10 ? "中优先级" : "低优先级";
+  const reason =
+    gapDays > 0
+      ? `预计 ${formatDate(runOutDate)} 断药，早于 ${formatDate(followUpDate)} 复诊 ${gapDays} 天，建议先续方再复诊。`
+      : `预计库存可覆盖到复诊窗口，但仍建议在 ${formatDate(latestRefillDate)} 前确认处方。`;
+
+  return { runOutDate, latestRefillDate, followUpDate, gapDays, priority, reason };
 }
 
 function isDashboardPage() {
@@ -934,7 +1082,10 @@ function executeHomeSearchItem(item) {
   if (item.type === "focus") {
     const target = document.querySelector(item.selector);
     if (!target) {
-      setHomeSearchResult(`未找到“${item.name}”对应的区域。`, true);
+      setHomeSearchResult(`正在回到首页定位“${item.name}”。`);
+      setTimeout(() => {
+        window.location.href = `./index.html?search=${encodeURIComponent(item.name)}`;
+      }, 220);
       return;
     }
 
@@ -1040,6 +1191,17 @@ function bindHomeSearch() {
     const match = HOME_SEARCH_INDEX.find((item) => item.name === name) || findHomeSearchMatches(name)[0];
     executeHomeSearchItem(match);
   });
+
+  const initialQuery = new URLSearchParams(window.location.search).get("search");
+  if (initialQuery) {
+    input.value = initialQuery;
+    const matches = findHomeSearchMatches(initialQuery);
+    renderSuggestions(matches.length ? matches : defaultList);
+    if (matches[0]) {
+      window.history.replaceState({}, "", window.location.pathname);
+      setTimeout(() => executeHomeSearchItem(matches[0]), 120);
+    }
+  }
 }
 
 function injectAccessibilityUi() {
@@ -1053,7 +1215,6 @@ function injectAccessibilityUi() {
       <button class="elder-switch" type="button" data-action="toggle-elder" aria-pressed="false">
         <span class="switch-text">
           <span class="switch-title">长辈模式</span>
-          <span class="switch-hint">一键大字与简化</span>
         </span>
         <span class="switch-dot" aria-hidden="true"></span>
       </button>
@@ -1304,6 +1465,8 @@ function bindAccessibilityShortcuts() {
     if (event.key === "Escape") {
       if (document.body.classList.contains("emergency-open")) {
         cancelEmergencyFlow();
+      } else if (document.body.classList.contains("brief-modal-open")) {
+        setBriefReportModal(false);
       } else {
         closeAssistPanel();
       }
@@ -1353,7 +1516,7 @@ function markNextDose() {
   const doseId = pending.getAttribute("data-dose-id");
   if (!doseId) return;
 
-  state.doseChecks[doseId] = true;
+  setDoseCheck(doseId, true);
   writeState(state);
 
   pending.classList.add("done");
@@ -1364,6 +1527,7 @@ function markNextDose() {
   }
 
   updateDoseSummary();
+  renderCareInsights();
 
   pending.scrollIntoView({
     behavior: accessibility.reducedMotion ? "auto" : "smooth",
@@ -1381,7 +1545,7 @@ function bindDoseItems() {
     const doseId = item.getAttribute("data-dose-id");
     const actionBtn = item.querySelector("[data-action='toggle-dose']");
 
-    const done = Boolean(state.doseChecks[doseId]);
+    const done = isDoseChecked(doseId);
     item.classList.toggle("done", done);
     if (actionBtn) {
       actionBtn.textContent = done ? "已服用" : "标记服用";
@@ -1390,15 +1554,17 @@ function bindDoseItems() {
 
     if (!actionBtn) return;
     actionBtn.addEventListener("click", () => {
-      state.doseChecks[doseId] = !state.doseChecks[doseId];
+      const nextValue = !isDoseChecked(doseId);
+      setDoseCheck(doseId, nextValue);
       writeState(state);
 
-      item.classList.toggle("done", state.doseChecks[doseId]);
-      actionBtn.textContent = state.doseChecks[doseId] ? "已服用" : "标记服用";
-      actionBtn.className = state.doseChecks[doseId] ? "btn-light" : "btn";
+      item.classList.toggle("done", nextValue);
+      actionBtn.textContent = nextValue ? "已服用" : "标记服用";
+      actionBtn.className = nextValue ? "btn-light" : "btn";
 
       updateDoseSummary();
-      showToast(state.doseChecks[doseId] ? "已记录本次服药" : "已取消该次记录");
+      renderCareInsights();
+      showToast(nextValue ? "已记录本次服药" : "已取消该次记录");
     });
   });
 
@@ -1406,24 +1572,258 @@ function bindDoseItems() {
 }
 
 function updateDoseSummary() {
-  const allDoseNodes = Array.from(document.querySelectorAll("[data-dose-id]"));
-  if (!allDoseNodes.length) return;
-
-  const total = allDoseNodes.length;
-  const done = allDoseNodes.filter((node) => node.classList.contains("done")).length;
-  const ratio = Math.round((done / total) * 100);
+  const snapshot = getAdherenceSnapshot();
 
   document.querySelectorAll("[data-bind='dose-summary']").forEach((el) => {
-    el.textContent = `${done} / ${total}`;
+    el.textContent = `${snapshot.done} / ${snapshot.total}`;
   });
 
   document.querySelectorAll("[data-bind='dose-ratio']").forEach((el) => {
-    el.textContent = `${ratio}%`;
+    el.textContent = `${snapshot.ratio}%`;
   });
 
   document.querySelectorAll("[data-bind='dose-progress']").forEach((el) => {
-    el.style.width = `${ratio}%`;
+    el.style.width = `${snapshot.ratio}%`;
   });
+}
+
+function buildVisitSummaryHtml() {
+  const snapshot = getAdherenceSnapshot();
+  const lowStock = getLowestStockMedicine();
+  const risk = getRefillRiskInfo(lowStock);
+  const latestNotes = state.notes.slice(0, 3);
+  const missedText = snapshot.missed.length
+    ? snapshot.missed.map(({ med, dose }) => `${dose.time} ${med.name}`).join("、")
+    : "今日暂无漏服";
+  const notesText = latestNotes.length
+    ? latestNotes.map((note) => `<li>${escapeHtml(note.severity)}: ${escapeHtml(note.content)}</li>`).join("")
+    : "<li>暂无症状备注</li>";
+
+  return `
+    <div class="summary-card">
+      <div class="summary-head">
+        <div>
+          <p class="section-kicker">Doctor Brief</p>
+          <h4>复诊沟通摘要</h4>
+        </div>
+        <span class="badge ${snapshot.ratio >= 80 ? "ok" : "warn"}">${snapshot.ratio}% 依从率</span>
+      </div>
+      <div class="summary-grid">
+        <div>
+          <b>患者画像</b>
+          <p>${CARE_PROFILE.name}，${CARE_PROFILE.age} 岁；${CARE_PROFILE.conditions.join("、")}。${CARE_PROFILE.routine}。</p>
+        </div>
+        <div>
+          <b>今日执行</b>
+          <p>已完成 ${snapshot.done}/${snapshot.total} 次；待关注: ${missedText}。</p>
+        </div>
+        <div>
+          <b>库存风险</b>
+          <p>${lowStock.name} 剩余 ${lowStock.stockDays} 天，${risk.reason}</p>
+        </div>
+        <div>
+          <b>建议沟通问题</b>
+          <p>晚间漏服是否需要调整提醒时间；低库存药是否可提前续方；近期不适是否与用药时机有关。</p>
+        </div>
+      </div>
+      <div class="summary-notes">
+        <b>近期症状记录</b>
+        <ul>${notesText}</ul>
+      </div>
+    </div>
+  `;
+}
+
+function renderVisitSummary(focus = false) {
+  document.querySelectorAll("[data-bind='visit-summary']").forEach((wrap) => {
+    wrap.innerHTML = buildVisitSummaryHtml();
+    wrap.hidden = false;
+    if (focus) {
+      wrap.scrollIntoView({ behavior: accessibility.reducedMotion ? "auto" : "smooth", block: "center" });
+    }
+  });
+}
+
+function renderRefillRiskInsights() {
+  document.querySelectorAll("[data-risk-med]").forEach((node) => {
+    const med = MEDICATIONS.find((item) => item.id === node.getAttribute("data-risk-med"));
+    if (!med) return;
+    const risk = getRefillRiskInfo(med);
+    node.innerHTML = `
+      <p class="info-meta"><b>风险解释:</b> ${risk.reason}</p>
+      <p class="info-meta">断药预估: ${formatDate(risk.runOutDate)} · 优先级: ${risk.priority}</p>
+    `;
+  });
+
+  const lowStock = getLowestStockMedicine();
+  const risk = getRefillRiskInfo(lowStock);
+  document.querySelectorAll("[data-bind='refill-risk-window']").forEach((node) => {
+    node.innerHTML = `
+      <div class="info-card warn">
+        <p class="info-title">最需要处理</p>
+        <p class="info-value">${lowStock.name} 剩余 ${lowStock.stockDays} 天</p>
+        <p class="info-meta">${risk.reason}</p>
+      </div>
+    `;
+  });
+}
+
+function renderCaregiverSummary() {
+  const snapshot = getAdherenceSnapshot();
+  const contact = getContactInfo();
+  const lowStock = getLowestStockMedicine();
+  const nextAction = snapshot.missed.length
+    ? `提醒完成 ${snapshot.missed[0].dose.time} ${snapshot.missed[0].med.name}`
+    : `协助确认 ${lowStock.name} 续方`;
+
+  document.querySelectorAll("[data-bind='caregiver-summary']").forEach((node) => {
+    node.innerHTML = `
+      <div class="summary-card compact">
+        <div class="summary-head">
+          <div>
+            <p class="section-kicker">Family Brief</p>
+            <h4>家属协同摘要</h4>
+          </div>
+          <span class="badge ${snapshot.missed.length ? "warn" : "ok"}">${contact.name}</span>
+        </div>
+        <p>今天已完成 ${snapshot.done}/${snapshot.total} 次服药；${snapshot.missed.length ? `仍有 ${snapshot.missed.length} 次待确认。` : "今日执行稳定。"}</p>
+        <p>建议家属动作: ${nextAction}；库存最低药为 ${lowStock.name}，剩余 ${lowStock.stockDays} 天。</p>
+        <div class="panel-tools">
+          <button class="btn-light" type="button" data-action="quick-help">生成提醒话术</button>
+          <a class="btn-ghost" data-bind="contact-call" href="#" style="text-decoration: none; display: inline-flex; align-items: center">联系家属</a>
+        </div>
+      </div>
+    `;
+  });
+
+  updateContactBindings();
+  document.querySelectorAll("[data-bind='caregiver-summary'] [data-action='quick-help']").forEach((btn) => {
+    if (btn.getAttribute("data-care-bound") === "1") return;
+    btn.setAttribute("data-care-bound", "1");
+    btn.addEventListener("click", triggerQuickHelp);
+  });
+}
+
+function renderWeeklyInsight() {
+  const snapshot = getAdherenceSnapshot();
+  const lowStock = getLowestStockMedicine();
+  document.querySelectorAll("[data-bind='weekly-insight']").forEach((node) => {
+    const advice = snapshot.eveningMissed
+      ? "晚间任务仍未完成，建议把提醒前移到晚餐后 15 分钟，并开启家属协助。"
+      : "今日关键任务执行稳定，下一步重点是提前处理低库存药品。";
+    node.innerHTML = `
+      <div class="tool-card insight-card">
+        <p class="info-title">本周洞察</p>
+        <p class="info-meta">${advice}</p>
+        <p class="info-meta">当前最低库存: ${lowStock.name} ${lowStock.stockDays} 天。</p>
+      </div>
+    `;
+  });
+}
+
+function renderCareInsights() {
+  renderWeeklyInsight();
+  renderRefillRiskInsights();
+  renderCaregiverSummary();
+  if (document.querySelector("[data-bind='visit-summary']:not([hidden])")) {
+    renderVisitSummary(false);
+  }
+  if (document.body.classList.contains("brief-modal-open")) {
+    renderBriefReport();
+  }
+}
+
+function getNextPendingDoseText() {
+  const pending = getAdherenceSnapshot().missed[0];
+  if (!pending) return "今日任务已完成";
+  return `${pending.dose.time} ${pending.med.name} ${pending.med.dose}`;
+}
+
+function buildBriefReportHtml() {
+  const snapshot = getAdherenceSnapshot();
+  const lowStock = getLowestStockMedicine();
+  const risk = getRefillRiskInfo(lowStock);
+  const contact = getContactInfo();
+  const latestNote = state.notes[0];
+  const missedText = snapshot.missed.length
+    ? snapshot.missed.map(({ med, dose }) => `${dose.time} ${med.name}`).join("、")
+    : "无";
+  const mainAction = snapshot.missed.length
+    ? `先完成 ${getNextPendingDoseText()}`
+    : `处理 ${lowStock.name} 续方`;
+
+  return `
+    <div class="brief-list">
+      <div class="brief-row urgent">
+        <span>现在先看</span>
+        <b>${mainAction}</b>
+      </div>
+      <div class="brief-row">
+        <span>今日服药</span>
+        <b>${snapshot.done}/${snapshot.total}，${snapshot.ratio}%</b>
+      </div>
+      <div class="brief-row">
+        <span>待确认</span>
+        <b>${missedText}</b>
+      </div>
+      <div class="brief-row">
+        <span>库存</span>
+        <b>${lowStock.name} 剩余 ${lowStock.stockDays} 天</b>
+      </div>
+      <div class="brief-row">
+        <span>复诊</span>
+        <b>${formatDate(risk.followUpDate)}</b>
+      </div>
+      <div class="brief-row">
+        <span>症状</span>
+        <b>${latestNote ? `${escapeHtml(latestNote.severity)}: ${escapeHtml(latestNote.content)}` : "暂无新增记录"}</b>
+      </div>
+      <div class="brief-row">
+        <span>家属</span>
+        <b>${contact.hasPhone ? `${contact.name} ${contact.phoneDisplay}` : "未设置联系人"}</b>
+      </div>
+    </div>
+    <p class="brief-action">建议下一步: ${risk.gapDays > 0 ? risk.reason : `联系家属协助确认 ${lowStock.name} 续方。`}</p>
+  `;
+}
+
+function renderBriefReport() {
+  const content = document.getElementById("brief-report-content");
+  if (!content) return;
+  content.innerHTML = buildBriefReportHtml();
+}
+
+function setBriefReportModal(open) {
+  const modal = document.getElementById("brief-report-modal");
+  if (!modal) return;
+  modal.classList.toggle("open", open);
+  modal.setAttribute("aria-hidden", open ? "false" : "true");
+  document.body.classList.toggle("brief-modal-open", open);
+  if (open) {
+    renderBriefReport();
+    const closeBtn = modal.querySelector("[data-action='close-brief-report']");
+    if (closeBtn) closeBtn.focus();
+  }
+}
+
+function bindBriefReport() {
+  const modal = document.getElementById("brief-report-modal");
+  document.querySelectorAll("[data-action='open-brief-report']").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setBriefReportModal(true);
+      showToast("已生成今日简要报告");
+    });
+  });
+
+  document.querySelectorAll("[data-action='close-brief-report']").forEach((btn) => {
+    btn.addEventListener("click", () => setBriefReportModal(false));
+  });
+
+  if (modal) {
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) setBriefReportModal(false);
+    });
+  }
 }
 
 function bindQuickActions() {
@@ -1441,7 +1841,8 @@ function bindQuickActions() {
 
   document.querySelectorAll("[data-action='mock-summary']").forEach((btn) => {
     btn.addEventListener("click", () => {
-      showToast("复诊摘要已生成（演示）");
+      renderVisitSummary(true);
+      showToast("已生成复诊沟通摘要");
     });
   });
 
@@ -1600,6 +2001,41 @@ function adviceByMedicine({ med, planned, current, symptom }) {
   };
 }
 
+function renderAiDecisionPath({ med, planned, current, symptom, result } = {}) {
+  const wrap = document.getElementById("ai-decision-path");
+  if (!wrap) return;
+
+  const p = parseHourMinute(planned || "");
+  const c = parseHourMinute(current || "");
+  const medLabel = {
+    metformin: "二甲双胍",
+    amlodipine: "氨氯地平",
+    atorvastatin: "阿托伐他汀",
+    generic: "其他慢病常用药"
+  }[med || "generic"];
+  const delay = p === null || c === null ? null : Math.round(((c - p) / 60) * 10) / 10;
+  const highRisk = `${symptom || ""}`.includes("胸") || `${symptom || ""}`.includes("呼吸") || `${symptom || ""}`.includes("剧烈");
+
+  wrap.innerHTML = `
+    <div class="decision-step ${med ? "done" : ""}">
+      <b>1. 药物类型</b>
+      <span>${medLabel || "等待选择"}</span>
+    </div>
+    <div class="decision-step ${delay !== null ? "done" : ""}">
+      <b>2. 延迟窗口</b>
+      <span>${delay === null ? "等待时间输入" : `已延迟 ${delay} 小时`}</span>
+    </div>
+    <div class="decision-step ${symptom ? (highRisk ? "warn" : "done") : ""}">
+      <b>3. 症状边界</b>
+      <span>${symptom ? (highRisk ? "命中高风险症状" : "未命中高风险症状") : "未填写不适描述"}</span>
+    </div>
+    <div class="decision-step ${result ? "done" : ""}">
+      <b>4. 建议动作</b>
+      <span>${result ? escapeHtml(result.title) : "生成后展示建议"}</span>
+    </div>
+  `;
+}
+
 function bindAiForm() {
   const form = document.getElementById("ai-form");
   if (!form) return;
@@ -1612,6 +2048,9 @@ function bindAiForm() {
     titleEl.textContent = state.lastAiResult.title;
     msgEl.textContent = state.lastAiResult.message;
     calloutEl.textContent = state.lastAiResult.callout;
+    renderAiDecisionPath(state.lastAiResult.context || {});
+  } else {
+    renderAiDecisionPath();
   }
 
   form.addEventListener("submit", (event) => {
@@ -1628,8 +2067,10 @@ function bindAiForm() {
     msgEl.textContent = result.message;
     calloutEl.textContent = result.callout;
 
-    state.lastAiResult = result;
+    const context = { med, planned, current, symptom, result };
+    state.lastAiResult = { ...result, context };
     writeState(state);
+    renderAiDecisionPath(context);
     showToast("已生成漏服补救建议");
   });
 }
@@ -1694,11 +2135,13 @@ document.addEventListener("DOMContentLoaded", () => {
   bindContactEditor();
   bindAccessibilityShortcuts();
   bindHomeSearch();
+  bindBriefReport();
   bindQuickActions();
   bindDoseItems();
   bindSymptomForm();
   bindAiForm();
   bindRefillCalc();
+  renderCareInsights();
   refreshAccessibilityUiState();
   setFooterYear();
   syncToastOffset();

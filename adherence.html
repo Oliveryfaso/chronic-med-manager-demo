@@ -31,7 +31,27 @@
           <a class="nav-link" href="./refill.html">续方复诊</a>
           <a class="nav-link" href="./ai-assist.html">AI 漏服助手</a>
         </nav>
-        <div class="user-pill">记录保存: 当前浏览器本地</div>
+        <form id="home-search-form" class="home-search nav-search" role="search" aria-label="药物与功能搜索">
+          <div class="home-search-row">
+            <input id="home-search-input" type="search" placeholder="搜索药物或功能" list="home-search-list" autocomplete="off" />
+            <button class="btn-light" type="submit">搜索</button>
+          </div>
+          <datalist id="home-search-list">
+            <option value="二甲双胍"></option>
+            <option value="缬沙坦"></option>
+            <option value="阿托伐他汀"></option>
+            <option value="氨氯地平"></option>
+            <option value="库存预警"></option>
+            <option value="用药计划"></option>
+            <option value="续方复诊"></option>
+            <option value="漏服补救"></option>
+            <option value="长辈模式"></option>
+            <option value="辅助功能"></option>
+          </datalist>
+          <p class="search-label">搜索建议</p>
+          <div id="home-search-suggest" class="home-search-suggest"></div>
+          <p id="home-search-results" class="home-search-results" hidden></p>
+        </form>
       </div>
     </header>
 
@@ -69,8 +89,8 @@
           </header>
 
           <div class="timeline">
-            <div class="dose-item" data-dose-id="adh_0800">
-              <div class="dose-time">08:00</div>
+            <div class="dose-item" data-dose-id="adh_0730">
+              <div class="dose-time">07:30</div>
               <div>
                 <p class="dose-name">二甲双胍 500mg</p>
                 <p class="dose-meta">早餐后 · 建议与进食绑定提醒</p>
@@ -78,8 +98,8 @@
               <button class="btn" data-action="toggle-dose">标记服用</button>
             </div>
 
-            <div class="dose-item" data-dose-id="adh_1200">
-              <div class="dose-time">12:00</div>
+            <div class="dose-item" data-dose-id="adh_1230">
+              <div class="dose-time">12:30</div>
               <div>
                 <p class="dose-name">缬沙坦 80mg</p>
                 <p class="dose-meta">午餐后 · 稳定血压</p>
@@ -87,11 +107,20 @@
               <button class="btn" data-action="toggle-dose">标记服用</button>
             </div>
 
-            <div class="dose-item" data-dose-id="adh_1830">
-              <div class="dose-time">18:30</div>
+            <div class="dose-item" data-dose-id="adh_1930">
+              <div class="dose-time">19:30</div>
               <div>
                 <p class="dose-name">阿托伐他汀 20mg</p>
                 <p class="dose-meta">晚餐后 · 近期出现一次漏服</p>
+              </div>
+              <button class="btn" data-action="toggle-dose">标记服用</button>
+            </div>
+
+            <div class="dose-item" data-dose-id="adh_1930_metformin">
+              <div class="dose-time">19:30</div>
+              <div>
+                <p class="dose-name">二甲双胍 500mg</p>
+                <p class="dose-meta">晚餐后 · 与晚餐绑定提醒</p>
               </div>
               <button class="btn" data-action="toggle-dose">标记服用</button>
             </div>
@@ -144,6 +173,7 @@
           </div>
 
           <p class="footer-note">连续漏服集中在晚间，建议开启家属协助提醒。</p>
+          <div data-bind="weekly-insight"></div>
         </article>
 
         <article class="panel span-6">
@@ -192,6 +222,7 @@
           </header>
 
           <div id="symptom-note-list" class="note-list"></div>
+          <div data-bind="visit-summary" hidden style="margin-top: 14px"></div>
         </article>
       </section>
 

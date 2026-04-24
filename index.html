@@ -31,7 +31,33 @@
           <a class="nav-link" href="./refill.html">续方复诊</a>
           <a class="nav-link" href="./ai-assist.html">AI 漏服助手</a>
         </nav>
-        <div class="user-pill">Demo 患者: 王宁 | 高血压 + 糖代谢异常</div>
+        <form id="home-search-form" class="home-search nav-search" role="search" aria-label="药物与功能搜索">
+          <div class="home-search-row">
+            <input
+              id="home-search-input"
+              type="search"
+              placeholder="搜索药物或功能"
+              list="home-search-list"
+              autocomplete="off"
+            />
+            <button class="btn-light" type="submit">搜索</button>
+          </div>
+          <datalist id="home-search-list">
+            <option value="二甲双胍"></option>
+            <option value="缬沙坦"></option>
+            <option value="阿托伐他汀"></option>
+            <option value="氨氯地平"></option>
+            <option value="库存预警"></option>
+            <option value="用药计划"></option>
+            <option value="续方复诊"></option>
+            <option value="漏服补救"></option>
+            <option value="长辈模式"></option>
+            <option value="辅助功能"></option>
+          </datalist>
+          <p class="search-label">搜索建议</p>
+          <div id="home-search-suggest" class="home-search-suggest"></div>
+          <p id="home-search-results" class="home-search-results" hidden></p>
+        </form>
       </div>
     </header>
 
@@ -39,42 +65,8 @@
       <section class="hero-banner">
         <div class="hero-main">
           <p class="hero-kicker">Today-first Workflow</p>
-          <h1 class="hero-title">今天该做什么，一眼看清</h1>
-          <p class="hero-summary">
-            以“下一次服药”为核心入口，把提醒、打卡、库存和复诊准备压缩成一条清晰路径。打开即能演示完整闭环，不依赖登录。
-          </p>
-          <form id="home-search-form" class="home-search" role="search" aria-label="药物与功能搜索">
-            <div class="home-search-row">
-              <input
-                id="home-search-input"
-                type="search"
-                placeholder="搜索药物或功能，如 二甲双胍、库存预警、漏服补救"
-                list="home-search-list"
-                autocomplete="off"
-              />
-              <button class="btn-light" type="submit">搜索</button>
-            </div>
-            <datalist id="home-search-list">
-              <option value="二甲双胍"></option>
-              <option value="缬沙坦"></option>
-              <option value="阿托伐他汀"></option>
-              <option value="氨氯地平"></option>
-              <option value="库存预警"></option>
-              <option value="用药计划"></option>
-              <option value="续方复诊"></option>
-              <option value="漏服补救"></option>
-              <option value="长辈模式"></option>
-              <option value="辅助功能"></option>
-            </datalist>
-            <p class="search-label">搜索建议</p>
-            <div id="home-search-suggest" class="home-search-suggest"></div>
-            <p id="home-search-results" class="home-search-results" hidden></p>
-          </form>
-          <div class="hero-chips">
-            <span class="chip">今日任务自动聚焦</span>
-            <span class="chip">漏服可一键补救</span>
-            <span class="chip">库存提前预警续方</span>
-          </div>
+          <h1 class="hero-title">今天做什么，一眼看清</h1>
+          <p class="hero-summary">先看下一次服药，再处理低库存和复诊准备。</p>
           <div class="panel-tools" style="margin-top: 22px">
             <button class="btn" data-action="mock-upload">导入并解析处方</button>
             <button class="btn-ghost" data-action="mock-summary">预览复诊摘要</button>
@@ -85,12 +77,10 @@
           <p class="section-kicker">下一次服药</p>
           <h2>19:30</h2>
           <strong>阿托伐他汀 20mg</strong>
-          <p class="muted">
-            今日完成 <b data-bind="dose-summary">0 / 0</b>，依从率 <b data-bind="dose-ratio">0%</b>
-          </p>
+          <p class="muted">今日完成 <b data-bind="dose-summary">0 / 0</b></p>
           <div class="progress-wrap">
             <div class="progress-label">
-              <span>今日执行进度</span>
+              <span>执行进度</span>
               <span data-bind="dose-ratio">0%</span>
             </div>
             <div class="progress"><span data-bind="dose-progress" style="width: 0%"></span></div>
@@ -103,6 +93,34 @@
       </section>
 
       <section class="layout-grid fade-seq">
+        <article class="panel span-12 quick-report-panel">
+          <header class="panel-head">
+            <div>
+              <p class="section-kicker">Quick Brief</p>
+              <h3 class="panel-title">今日简要报告</h3>
+            </div>
+            <button class="btn" type="button" data-action="open-brief-report">一键生成简报</button>
+          </header>
+          <div class="quick-report-grid">
+            <div>
+              <span>下一次</span>
+              <strong>19:30 阿托伐他汀</strong>
+            </div>
+            <div>
+              <span>完成度</span>
+              <strong data-bind="dose-ratio">0%</strong>
+            </div>
+            <div>
+              <span>库存风险</span>
+              <strong>缬沙坦 4 天</strong>
+            </div>
+            <div>
+              <span>复诊</span>
+              <strong>2026-05-03</strong>
+            </div>
+          </div>
+        </article>
+
         <article class="panel span-8 dashboard-core-panel">
           <header class="panel-head">
             <div>
@@ -136,6 +154,15 @@
               <div>
                 <p class="dose-name">阿托伐他汀 20mg</p>
                 <p class="dose-meta">晚餐后 · 降脂方案</p>
+              </div>
+              <button class="btn" data-action="toggle-dose">标记服用</button>
+            </div>
+
+            <div class="dose-item next" data-dose-id="d1930_metformin">
+              <div class="dose-time">19:30</div>
+              <div>
+                <p class="dose-name">二甲双胍 500mg</p>
+                <p class="dose-meta">晚餐后 · 与晚餐绑定提醒</p>
               </div>
               <button class="btn" data-action="toggle-dose">标记服用</button>
             </div>
@@ -193,6 +220,7 @@
             </div>
           </div>
           <p class="footer-note">高频操作尽量保持一键完成，减少患者操作负担。</p>
+          <div data-bind="weekly-insight"></div>
         </article>
 
         <article class="panel span-8 dashboard-optional-panel dashboard-followup-panel">
@@ -217,6 +245,7 @@
             <button class="btn-light" data-action="mock-summary">生成摘要</button>
             <a class="btn-ghost" href="./adherence.html" style="text-decoration: none; display: inline-flex; align-items: center">查看打卡细节</a>
           </div>
+          <div data-bind="visit-summary" hidden style="margin-top: 14px"></div>
         </article>
       </section>
 
@@ -224,6 +253,19 @@
         Demo 模式: 数据仅保存在当前浏览器，适合考核演示。<span data-bind="year"></span>
       </p>
     </main>
+
+    <section id="brief-report-modal" class="brief-modal" aria-hidden="true">
+      <div class="brief-modal-card" role="dialog" aria-modal="true" aria-labelledby="brief-report-title">
+        <div class="summary-head">
+          <div>
+            <p class="section-kicker">Today Brief</p>
+            <h3 id="brief-report-title">核心信息简报</h3>
+          </div>
+          <button class="assist-close" type="button" data-action="close-brief-report" aria-label="关闭简报">关闭</button>
+        </div>
+        <div id="brief-report-content"></div>
+      </div>
+    </section>
 
     <div id="toast-container" style="position: fixed; right: 18px; bottom: 18px; z-index: 100"></div>
     <script src="./script.js"></script>

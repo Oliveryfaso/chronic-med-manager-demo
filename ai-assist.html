@@ -31,7 +31,27 @@
           <a class="nav-link" href="./refill.html">续方复诊</a>
           <a class="nav-link active" href="./ai-assist.html">AI 漏服助手</a>
         </nav>
-        <div class="user-pill">演示原则: 保守建议优先</div>
+        <form id="home-search-form" class="home-search nav-search" role="search" aria-label="药物与功能搜索">
+          <div class="home-search-row">
+            <input id="home-search-input" type="search" placeholder="搜索药物或功能" list="home-search-list" autocomplete="off" />
+            <button class="btn-light" type="submit">搜索</button>
+          </div>
+          <datalist id="home-search-list">
+            <option value="二甲双胍"></option>
+            <option value="缬沙坦"></option>
+            <option value="阿托伐他汀"></option>
+            <option value="氨氯地平"></option>
+            <option value="库存预警"></option>
+            <option value="用药计划"></option>
+            <option value="续方复诊"></option>
+            <option value="漏服补救"></option>
+            <option value="长辈模式"></option>
+            <option value="辅助功能"></option>
+          </datalist>
+          <p class="search-label">搜索建议</p>
+          <div id="home-search-suggest" class="home-search-suggest"></div>
+          <p id="home-search-results" class="home-search-results" hidden></p>
+        </form>
       </div>
     </header>
 
@@ -103,8 +123,8 @@
                 <textarea id="ai-symptom" placeholder="示例: 略头晕，无胸痛，无呼吸困难"></textarea>
               </div>
 
-              <div class="field full">
-                <button type="submit" class="btn">生成补救建议</button>
+              <div class="field full ai-submit-row">
+                <button type="submit" class="btn ai-submit-btn">生成补救建议</button>
               </div>
             </form>
 
@@ -115,18 +135,24 @@
                 <div class="callout" id="ai-result-callout">若出现剧烈不适，请立即联系医生。</div>
               </div>
 
-              <div class="stack" style="margin-top: 12px">
+              <div class="ai-support-grid">
                 <div class="tool-card">
-                  <p class="info-title">规则透明</p>
-                  <p class="info-meta">基于时间延迟窗口做保守判断，避免“补服过量”。</p>
+                  <p class="info-title">决策路径</p>
+                  <div id="ai-decision-path" class="decision-path"></div>
                 </div>
-                <div class="tool-card">
-                  <p class="info-title">高风险优先识别</p>
-                  <p class="info-meta">出现胸痛、呼吸困难、剧烈不适等关键词时，直接转入就医提示。</p>
-                </div>
-                <div class="tool-card">
-                  <p class="info-title">可追溯</p>
-                  <p class="info-meta">建议结果会保留在本地，便于复诊时回顾漏服处理过程。</p>
+                <div class="ai-note-grid">
+                  <div class="tool-card">
+                    <p class="info-title">规则透明</p>
+                    <p class="info-meta">按时间窗口保守判断。</p>
+                  </div>
+                  <div class="tool-card">
+                    <p class="info-title">高风险优先</p>
+                    <p class="info-meta">胸痛、呼吸困难优先就医。</p>
+                  </div>
+                  <div class="tool-card">
+                    <p class="info-title">可追溯</p>
+                    <p class="info-meta">结果保留在本地。</p>
+                  </div>
                 </div>
               </div>
             </div>
