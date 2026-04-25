@@ -46,7 +46,7 @@
     <main class="page-wrap">
       <section class="hero-banner">
         <div class="hero-main">
-          <p class="hero-kicker">Adherence Tracking</p>
+          <p class="hero-kicker">打卡记录</p>
           <h1 class="hero-title">打卡不只是勾选，更是风险前置</h1>
           <p class="hero-summary">
             这里把服药完成率、漏服位置和症状变化放在一起，形成可解释的依从性记录。复诊时可直接转为摘要，减少主观回忆偏差。
@@ -70,8 +70,8 @@
         <article class="panel span-8">
           <header class="panel-head">
             <div>
-              <p class="section-kicker">Today Checklist</p>
               <h3 class="panel-title">今日打卡清单</h3>
+              <p class="title-sub">Today Checklist</p>
             </div>
             <span class="pill">可用于回访复盘</span>
           </header>
@@ -83,7 +83,7 @@
                 <p class="dose-name">二甲双胍 500mg</p>
                 <p class="dose-meta">早餐后 · 建议与进食绑定提醒</p>
               </div>
-              <button class="btn" data-action="toggle-dose">标记服用</button>
+              <button class="btn" data-action="toggle-dose">记录本次服药</button>
             </div>
 
             <div class="dose-item" data-dose-id="adh_1230">
@@ -92,7 +92,7 @@
                 <p class="dose-name">缬沙坦 80mg</p>
                 <p class="dose-meta">午餐后 · 稳定血压</p>
               </div>
-              <button class="btn" data-action="toggle-dose">标记服用</button>
+              <button class="btn" data-action="toggle-dose">记录本次服药</button>
             </div>
 
             <div class="dose-item" data-dose-id="adh_1930">
@@ -101,7 +101,7 @@
                 <p class="dose-name">阿托伐他汀 20mg</p>
                 <p class="dose-meta">晚餐后 · 近期出现一次漏服</p>
               </div>
-              <button class="btn" data-action="toggle-dose">标记服用</button>
+              <button class="btn" data-action="toggle-dose">记录本次服药</button>
             </div>
 
             <div class="dose-item" data-dose-id="adh_1930_metformin">
@@ -110,7 +110,7 @@
                 <p class="dose-name">二甲双胍 500mg</p>
                 <p class="dose-meta">晚餐后 · 与晚餐绑定提醒</p>
               </div>
-              <button class="btn" data-action="toggle-dose">标记服用</button>
+              <button class="btn" data-action="toggle-dose">记录本次服药</button>
             </div>
 
             <div class="dose-item" data-dose-id="adh_2200">
@@ -119,7 +119,7 @@
                 <p class="dose-name">氨氯地平 5mg</p>
                 <p class="dose-meta">睡前 · 可与睡前流程绑定</p>
               </div>
-              <button class="btn" data-action="toggle-dose">标记服用</button>
+              <button class="btn" data-action="toggle-dose">记录本次服药</button>
             </div>
           </div>
         </article>
@@ -127,8 +127,8 @@
         <article class="panel span-4">
           <header class="panel-head">
             <div>
-              <p class="section-kicker">7-Day Trend</p>
               <h3 class="panel-title">依从率趋势</h3>
+              <p class="title-sub">7-Day Trend</p>
             </div>
           </header>
 
@@ -167,8 +167,8 @@
         <article class="panel span-6">
           <header class="panel-head">
             <div>
-              <p class="section-kicker">Symptom Input</p>
               <h3 class="panel-title">症状记录</h3>
+              <p class="title-sub">Symptom Input</p>
             </div>
           </header>
 
@@ -203,10 +203,10 @@
         <article class="panel span-6">
           <header class="panel-head">
             <div>
-              <p class="section-kicker">Recent Notes</p>
               <h3 class="panel-title">近期备注</h3>
+              <p class="title-sub">Recent Notes</p>
             </div>
-            <button class="btn-ghost" data-action="mock-summary">生成复诊摘要</button>
+            <button class="btn-ghost" data-action="mock-summary">生成给医生看的复诊摘要</button>
           </header>
 
           <div id="symptom-note-list" class="note-list"></div>

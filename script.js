@@ -772,8 +772,8 @@ function injectDashboardPriorityPanel() {
   panel.innerHTML = `
     <header class="panel-head">
       <div>
-        <p class="section-kicker">Elder Quick Actions</p>
         <h3 class="panel-title">长辈简化首页</h3>
+        <p class="title-sub">Elder Quick Actions</p>
       </div>
       <span class="badge ok">只保留高频动作</span>
     </header>
@@ -1586,7 +1586,7 @@ function bindDoseItems() {
     const done = isDoseChecked(doseId);
     item.classList.toggle("done", done);
     if (actionBtn) {
-      actionBtn.textContent = done ? "已服用" : "标记服用";
+      actionBtn.textContent = done ? "已服用" : "记录本次服药";
       actionBtn.className = done ? "btn-light" : "btn";
     }
 
@@ -1597,7 +1597,7 @@ function bindDoseItems() {
       writeState(state);
 
       item.classList.toggle("done", nextValue);
-      actionBtn.textContent = nextValue ? "已服用" : "标记服用";
+      actionBtn.textContent = nextValue ? "已服用" : "记录本次服药";
       actionBtn.className = nextValue ? "btn-light" : "btn";
 
       updateDoseSummary();
@@ -1641,8 +1641,8 @@ function buildVisitSummaryHtml() {
     <div class="summary-card">
       <div class="summary-head">
         <div>
-          <p class="section-kicker">Doctor Brief</p>
           <h4>复诊沟通摘要</h4>
+          <p class="title-sub">Doctor Brief</p>
         </div>
         <span class="badge ${snapshot.ratio >= 80 ? "ok" : "warn"}">${snapshot.ratio}% 依从率</span>
       </div>
@@ -1719,8 +1719,8 @@ function renderCaregiverSummary() {
       <div class="summary-card compact">
         <div class="summary-head">
           <div>
-            <p class="section-kicker">Family Brief</p>
             <h4>家属协同摘要</h4>
+            <p class="title-sub">Family Brief</p>
           </div>
           <span class="badge ${snapshot.missed.length ? "warn" : "ok"}">${contact.name}</span>
         </div>
@@ -1965,17 +1965,26 @@ function adviceByMedicine({ med, planned, current, symptom }) {
     return {
       title: "信息不足",
       message: "请填写完整时间后再判断。",
+      riskLevel: "需咨询医生",
+      riskClass: "consult",
+      reason: "因为缺少原计划时间或当前时间，系统无法判断延迟窗口和距下次服药的间隔。",
       callout: "如出现明显不适，请立即联系医生。"
     };
   }
 
-  const delayHours = (c - p) / 60;
+  const elapsedMinutes = c >= p ? c - p : c + 24 * 60 - p;
+  const delayHours = elapsedMinutes / 60;
+  const currentSameDay = c >= p;
   const highRisk = symptom.includes("胸") || symptom.includes("呼吸") || symptom.includes("剧烈");
+  const delayText = `${Math.max(0, Math.round(delayHours * 10) / 10)} 小时`;
 
   if (highRisk) {
     return {
       title: "优先就医",
       message: "已识别到高风险不适描述，不建议仅依赖自动补救建议。",
+      riskLevel: "立即就医",
+      riskClass: "emergency",
+      reason: "因为不适描述中包含胸痛、呼吸困难或剧烈不适等高风险信号，安全优先级高于补服判断。",
       callout: "请尽快联系医生或急救服务。"
     };
   }
@@ -1985,6 +1994,9 @@ function adviceByMedicine({ med, planned, current, symptom }) {
       return {
         title: "可在当前餐后补服",
         message: "延迟时间较短，可随当前进食补服本次剂量，下一次按原计划执行。",
+        riskLevel: "低风险",
+        riskClass: "low",
+        reason: `因为二甲双胍延迟约 ${delayText}，仍处在较短补服窗口，且未命中高风险症状。`,
         callout: "若出现胃部不适，记录后与医生沟通。"
       };
     }
@@ -1992,12 +2004,18 @@ function adviceByMedicine({ med, planned, current, symptom }) {
       return {
         title: "视下次间隔决定",
         message: "若距下一次服药仍有 4 小时以上，可补服；否则跳过本次，避免过近重复。",
+        riskLevel: "需咨询医生",
+        riskClass: "consult",
+        reason: `因为二甲双胍已延迟约 ${delayText}，是否补服取决于距下次服药是否仍有足够间隔。`,
         callout: "不要自行双倍补服。"
       };
     }
     return {
       title: "建议跳过本次",
       message: "距离原计划时间较久，建议跳过并按下次原计划服用。",
+      riskLevel: "需咨询医生",
+      riskClass: "consult",
+      reason: `因为二甲双胍已延迟约 ${delayText}，距离原计划时间较久，补服可能与后续剂量过近。`,
       callout: "若连续漏服，建议咨询医生调整方案。"
     };
   }
@@ -2007,27 +2025,39 @@ function adviceByMedicine({ med, planned, current, symptom }) {
       return {
         title: "可尽快补服",
         message: "当前仍可补服本次剂量，后续继续按固定时段服药。",
+        riskLevel: "低风险",
+        riskClass: "low",
+        reason: `因为氨氯地平延迟约 ${delayText}，仍在保守补服窗口内，且未输入高风险不适。`,
         callout: "若已接近下一次服药时间，优先咨询医生。"
       };
     }
     return {
       title: "不建议补服",
       message: "延迟过久，建议跳过本次并恢复原日程，避免重复降压风险。",
+      riskLevel: "需咨询医生",
+      riskClass: "consult",
+      reason: `因为氨氯地平已延迟约 ${delayText}，补服可能造成后续降压药效过近或叠加。`,
       callout: "监测血压，异常波动及时咨询医生。"
     };
   }
 
   if (med === "atorvastatin") {
-    if (c <= 23 * 60 + 30 && delayHours <= 5) {
+    if (currentSameDay && c <= 23 * 60 + 30 && delayHours <= 5) {
       return {
         title: "今晚可补服",
         message: "尚在当天夜间窗口，可补服一次，次日恢复正常节奏。",
+        riskLevel: "低风险",
+        riskClass: "low",
+        reason: `因为阿托伐他汀仍在当天夜间补服窗口内，延迟约 ${delayText}，未命中高风险症状。`,
         callout: "不要额外增加剂量。"
       };
     }
     return {
       title: "直接进入下一周期",
       message: "已经超过建议补服窗口，建议本次跳过，按次日计划继续。",
+      riskLevel: "需咨询医生",
+      riskClass: "consult",
+      reason: "因为当前时间已超过当天夜间补服窗口，继续补服的收益不明确，优先避免额外加量。",
       callout: "若频繁漏服，可启用家属提醒。"
     };
   }
@@ -2035,6 +2065,9 @@ function adviceByMedicine({ med, planned, current, symptom }) {
   return {
     title: "保守建议",
     message: "请根据处方说明优先执行，不确定时联系医生或药师确认。",
+    riskLevel: "需咨询医生",
+    riskClass: "consult",
+    reason: "因为当前药物未纳入演示规则库，系统无法给出个体化补服窗口，只能提示按处方或咨询专业人员。",
     callout: "不要自行增加剂量补偿漏服。"
   };
 }
@@ -2051,8 +2084,10 @@ function renderAiDecisionPath({ med, planned, current, symptom, result } = {}) {
     atorvastatin: "阿托伐他汀",
     generic: "其他慢病常用药"
   }[med || "generic"];
-  const delay = p === null || c === null ? null : Math.round(((c - p) / 60) * 10) / 10;
+  const delay =
+    p === null || c === null ? null : Math.round((((c >= p ? c - p : c + 24 * 60 - p) / 60) * 10)) / 10;
   const highRisk = `${symptom || ""}`.includes("胸") || `${symptom || ""}`.includes("呼吸") || `${symptom || ""}`.includes("剧烈");
+  const resultClass = result?.riskClass === "emergency" ? "danger" : result?.riskClass === "consult" ? "warn" : result ? "done" : "";
 
   wrap.innerHTML = `
     <div class="decision-step ${med ? "done" : ""}">
@@ -2067,27 +2102,39 @@ function renderAiDecisionPath({ med, planned, current, symptom, result } = {}) {
       <b>3. 症状边界</b>
       <span>${symptom ? (highRisk ? "命中高风险症状" : "未命中高风险症状") : "未填写不适描述"}</span>
     </div>
-    <div class="decision-step ${result ? "done" : ""}">
+    <div class="decision-step ${resultClass}">
       <b>4. 建议动作</b>
-      <span>${result ? escapeHtml(result.title) : "生成后展示建议"}</span>
+      <span>${result ? `${escapeHtml(result.title)} · ${escapeHtml(result.riskLevel || "待判断")}` : "生成后展示建议"}</span>
     </div>
   `;
+}
+
+function updateAiResultView(result = {}) {
+  const titleEl = document.getElementById("ai-result-title");
+  const msgEl = document.getElementById("ai-result-message");
+  const calloutEl = document.getElementById("ai-result-callout");
+  const reasonEl = document.getElementById("ai-result-reason");
+  const riskEl = document.getElementById("ai-risk-badge");
+
+  if (titleEl) titleEl.textContent = result.title || "等待输入";
+  if (msgEl) msgEl.textContent = result.message || "请填写左侧信息后生成建议。";
+  if (calloutEl) calloutEl.textContent = result.callout || "若出现剧烈不适，请立即联系医生。";
+  if (reasonEl) reasonEl.textContent = result.reason || "生成后会显示判断依据，例如距离下次服药时间、药物类型和症状边界。";
+  if (riskEl) {
+    riskEl.textContent = result.riskLevel || "待判断";
+    riskEl.className = `risk-badge ${result.riskClass || "neutral"}`;
+  }
 }
 
 function bindAiForm() {
   const form = document.getElementById("ai-form");
   if (!form) return;
 
-  const titleEl = document.getElementById("ai-result-title");
-  const msgEl = document.getElementById("ai-result-message");
-  const calloutEl = document.getElementById("ai-result-callout");
-
   if (state.lastAiResult) {
-    titleEl.textContent = state.lastAiResult.title;
-    msgEl.textContent = state.lastAiResult.message;
-    calloutEl.textContent = state.lastAiResult.callout;
+    updateAiResultView(state.lastAiResult);
     renderAiDecisionPath(state.lastAiResult.context || {});
   } else {
+    updateAiResultView();
     renderAiDecisionPath();
   }
 
@@ -2101,9 +2148,7 @@ function bindAiForm() {
 
     const result = adviceByMedicine({ med, planned, current, symptom });
 
-    titleEl.textContent = result.title;
-    msgEl.textContent = result.message;
-    calloutEl.textContent = result.callout;
+    updateAiResultView(result);
 
     const context = { med, planned, current, symptom, result };
     state.lastAiResult = { ...result, context };
@@ -2153,6 +2198,18 @@ function setFooterYear() {
   });
 }
 
+function renderFollowupCountdown() {
+  const followUpDate = new Date(`${CARE_PROFILE.followUpDate}T00:00:00+08:00`);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const days = Math.ceil((followUpDate - today) / 86400000);
+  const text = days > 0 ? `距复诊还有 ${days} 天` : days === 0 ? "今天复诊" : "复诊日期已过";
+
+  document.querySelectorAll("[data-bind='followup-countdown']").forEach((el) => {
+    el.textContent = text;
+  });
+}
+
 function bindResizeSync() {
   let bound = window.__cm_resize_bound__;
   if (bound) return;
@@ -2181,6 +2238,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindRefillCalc();
   renderCareInsights();
   refreshAccessibilityUiState();
+  renderFollowupCountdown();
   setFooterYear();
   syncToastOffset();
 });

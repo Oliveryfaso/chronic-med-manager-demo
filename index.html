@@ -51,12 +51,12 @@
     <main class="page-wrap">
       <section class="hero-banner">
         <div class="hero-main">
-          <p class="hero-kicker">Today-first Workflow</p>
+          <p class="hero-kicker">今日优先工作流</p>
           <h1 class="hero-title">今天做什么，一眼看清</h1>
           <p class="hero-summary">先看下一次服药，再处理低库存和复诊准备。</p>
           <div class="panel-tools" style="margin-top: 22px">
-            <button class="btn" data-action="mock-upload">导入并解析处方</button>
-            <button class="btn-ghost" data-action="mock-summary">预览复诊摘要</button>
+            <button class="btn" data-action="mock-upload">导入处方并生成计划</button>
+            <button class="btn-ghost" data-action="mock-summary">生成给医生看的摘要</button>
           </div>
         </div>
 
@@ -83,8 +83,8 @@
         <article class="panel span-12 quick-report-panel">
           <header class="panel-head">
             <div>
-              <p class="section-kicker">Quick Brief</p>
               <h3 class="panel-title">今日简要报告</h3>
+              <p class="title-sub">Today Brief</p>
             </div>
             <button class="btn" type="button" data-action="open-brief-report">一键生成简报</button>
           </header>
@@ -108,14 +108,56 @@
           </div>
         </article>
 
-        <article class="panel span-8 dashboard-core-panel">
+        <article class="panel span-6 dashboard-inventory-panel home-assist-panel">
           <header class="panel-head">
             <div>
-              <p class="section-kicker">Medication Timeline</p>
-              <h3 class="panel-title">今日时间轴</h3>
+              <h3 class="panel-title">库存风险</h3>
+              <p class="title-sub">Refill Risk</p>
             </div>
-            <span class="pill">自动同步到打卡记录页</span>
           </header>
+          <div class="assist-highlight">
+            <span class="assist-label">辅助 1</span>
+            <strong>缬沙坦剩余 4 天</strong>
+            <p>建议 2 天内续方，避免治疗中断。</p>
+          </div>
+          <div class="stack">
+            <div class="info-card">
+              <p class="info-title">二甲双胍</p>
+              <p class="info-value">剩余 11 天</p>
+              <p class="info-meta">库存稳定，本周无需处理</p>
+            </div>
+            <a class="btn-light" href="./refill.html" style="text-decoration: none; display: inline-flex; justify-content: center; align-items: center">查看续方与库存安排</a>
+          </div>
+        </article>
+
+        <article class="panel span-6 dashboard-followup-panel home-assist-panel">
+          <header class="panel-head">
+            <div>
+              <h3 class="panel-title">复诊倒计时</h3>
+              <p class="title-sub">Follow-up Countdown</p>
+            </div>
+            <span class="badge warn">2026-05-03</span>
+          </header>
+          <div class="assist-highlight">
+            <span class="assist-label">辅助 2</span>
+            <strong data-bind="followup-countdown">距复诊还有 8 天</strong>
+            <p>已自动汇总近 7 天服药、漏服、症状和库存风险。</p>
+          </div>
+          <div class="panel-tools" style="margin-top: 14px">
+            <button class="btn-light" data-action="mock-summary">生成给医生看的复诊摘要</button>
+            <a class="btn-ghost" href="./adherence.html" style="text-decoration: none; display: inline-flex; align-items: center">查看打卡细节</a>
+          </div>
+          <div data-bind="visit-summary" hidden style="margin-top: 14px"></div>
+        </article>
+
+        <details class="panel span-8 dashboard-core-panel collapse-panel">
+          <summary>
+            <span>
+              <strong>今日时间轴</strong>
+              <small>Medication Timeline</small>
+            </span>
+            <span class="pill">展开查看全部服药时段</span>
+          </summary>
 
           <div class="timeline">
             <div class="dose-item" data-dose-id="d0730">
@@ -124,7 +166,7 @@
                 <p class="dose-name">二甲双胍 500mg</p>
                 <p class="dose-meta">早餐后 · 控制血糖</p>
               </div>
-              <button class="btn" data-action="toggle-dose">标记服用</button>
+              <button class="btn" data-action="toggle-dose">记录本次服药</button>
             </div>
 
             <div class="dose-item" data-dose-id="d1230">
@@ -133,7 +175,7 @@
                 <p class="dose-name">缬沙坦 80mg</p>
                 <p class="dose-meta">午餐后 · 稳定血压</p>
               </div>
-              <button class="btn" data-action="toggle-dose">标记服用</button>
+              <button class="btn" data-action="toggle-dose">记录本次服药</button>
             </div>
 
             <div class="dose-item next" data-dose-id="d1930">
@@ -142,7 +184,7 @@
                 <p class="dose-name">阿托伐他汀 20mg</p>
                 <p class="dose-meta">晚餐后 · 降脂方案</p>
               </div>
-              <button class="btn" data-action="toggle-dose">标记服用</button>
+              <button class="btn" data-action="toggle-dose">记录本次服药</button>
             </div>
 
             <div class="dose-item next" data-dose-id="d1930_metformin">
@@ -151,7 +193,7 @@
                 <p class="dose-name">二甲双胍 500mg</p>
                 <p class="dose-meta">晚餐后 · 与晚餐绑定提醒</p>
               </div>
-              <button class="btn" data-action="toggle-dose">标记服用</button>
+              <button class="btn" data-action="toggle-dose">记录本次服药</button>
             </div>
 
             <div class="dose-item" data-dose-id="d2200">
@@ -160,40 +202,19 @@
                 <p class="dose-name">氨氯地平 5mg</p>
                 <p class="dose-meta">睡前 · 长效降压</p>
               </div>
-              <button class="btn" data-action="toggle-dose">标记服用</button>
+              <button class="btn" data-action="toggle-dose">记录本次服药</button>
             </div>
           </div>
-        </article>
+        </details>
 
-        <article class="panel span-4 dashboard-inventory-panel">
-          <header class="panel-head">
-            <div>
-              <p class="section-kicker">Refill Risk</p>
-              <h3 class="panel-title">库存预警</h3>
-            </div>
-          </header>
-          <div class="stack">
-            <div class="info-card warn">
-              <p class="info-title">缬沙坦</p>
-              <p class="info-value">剩余 4 天</p>
-              <p class="info-meta">建议 2 天内续方，避免治疗中断</p>
-            </div>
-            <div class="info-card">
-              <p class="info-title">二甲双胍</p>
-              <p class="info-value">剩余 11 天</p>
-              <p class="info-meta">库存稳定，本周无需处理</p>
-            </div>
-            <a class="btn-light" href="./refill.html" style="text-decoration: none; display: inline-flex; justify-content: center; align-items: center">进入续方复诊页</a>
-          </div>
-        </article>
-
-        <article class="panel span-4 dashboard-optional-panel dashboard-analytics-panel">
-          <header class="panel-head">
-            <div>
-              <p class="section-kicker">Daily Snapshot</p>
-              <h3 class="panel-title">今日总览</h3>
-            </div>
-          </header>
+        <details class="panel span-4 dashboard-optional-panel dashboard-analytics-panel collapse-panel">
+          <summary>
+            <span>
+              <strong>今日总览</strong>
+              <small>Daily Snapshot</small>
+            </span>
+            <span class="pill">展开</span>
+          </summary>
           <div class="metric-row" style="grid-template-columns: repeat(2, minmax(0, 1fr))">
             <div class="metric-card">
               <p class="metric-label">服药完成</p>
@@ -208,32 +229,7 @@
           </div>
           <p class="footer-note">高频操作尽量保持一键完成，减少患者操作负担。</p>
           <div data-bind="weekly-insight"></div>
-        </article>
-
-        <article class="panel span-8 dashboard-optional-panel dashboard-followup-panel">
-          <header class="panel-head">
-            <div>
-              <p class="section-kicker">Follow-up Readiness</p>
-              <h3 class="panel-title">复诊前准备</h3>
-            </div>
-            <span class="badge warn">下次复诊 2026-05-03</span>
-          </header>
-          <div class="list-grid">
-            <div class="list-item">
-              <h4>已自动汇总近 7 天数据</h4>
-              <p>包含服药完成率、漏服情况、症状记录和库存风险标签。</p>
-            </div>
-            <div class="list-item">
-              <h4>可生成复诊沟通摘要</h4>
-              <p>用于医生快速理解患者最近执行状态，减少复诊沟通成本。</p>
-            </div>
-          </div>
-          <div class="panel-tools" style="margin-top: 14px">
-            <button class="btn-light" data-action="mock-summary">生成摘要</button>
-            <a class="btn-ghost" href="./adherence.html" style="text-decoration: none; display: inline-flex; align-items: center">查看打卡细节</a>
-          </div>
-          <div data-bind="visit-summary" hidden style="margin-top: 14px"></div>
-        </article>
+        </details>
       </section>
 
       <p class="footer-note">
@@ -245,8 +241,8 @@
       <div class="brief-modal-card" role="dialog" aria-modal="true" aria-labelledby="brief-report-title">
         <div class="summary-head">
           <div>
-            <p class="section-kicker">Today Brief</p>
             <h3 id="brief-report-title">核心信息简报</h3>
+            <p class="title-sub">Today Brief</p>
           </div>
           <button class="assist-close" type="button" data-action="close-brief-report" aria-label="关闭简报">关闭</button>
         </div>

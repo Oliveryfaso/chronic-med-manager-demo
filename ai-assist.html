@@ -46,7 +46,7 @@
     <main class="page-wrap">
       <section class="hero-banner">
         <div class="hero-main">
-          <p class="hero-kicker">AI Missed-Dose Assistant</p>
+          <p class="hero-kicker">AI 漏服助手</p>
           <h1 class="hero-title">漏服先给可执行建议，再给风险边界</h1>
           <p class="hero-summary">
             这不是开放聊天，而是围绕真实高频问题进行结构化判断。用户只需输入药物、原计划时间、当前时间和不适描述，就能得到保守型补救建议。
@@ -69,8 +69,8 @@
         <article class="panel span-12">
           <header class="panel-head">
             <div>
-              <p class="section-kicker">Decision Form</p>
               <h3 class="panel-title">漏服补救判断</h3>
+              <p class="title-sub">Decision Form</p>
             </div>
             <span class="pill">输入 4 项信息即可</span>
           </header>
@@ -118,8 +118,12 @@
 
             <div>
               <div class="result-card" id="ai-result">
-                <h4 id="ai-result-title">等待输入</h4>
+                <div class="result-head">
+                  <h4 id="ai-result-title">等待输入</h4>
+                  <span id="ai-risk-badge" class="risk-badge neutral">待判断</span>
+                </div>
                 <p id="ai-result-message">请填写左侧信息后生成建议。</p>
+                <div class="result-reason" id="ai-result-reason">生成后会显示判断依据，例如距离下次服药时间、药物类型和症状边界。</div>
                 <div class="callout" id="ai-result-callout">若出现剧烈不适，请立即联系医生。</div>
               </div>
 

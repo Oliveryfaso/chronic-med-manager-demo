@@ -465,6 +465,94 @@ textarea {
   line-height: 1.16;
 }
 
+.title-sub {
+  margin: 5px 0 0;
+  color: var(--ink-500);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.home-assist-panel {
+  border-color: rgba(46, 145, 116, 0.18);
+}
+
+.assist-highlight {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(46, 145, 116, 0.2);
+  background: rgba(46, 145, 116, 0.1);
+  padding: 16px;
+}
+
+.assist-highlight strong {
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.assist-highlight p {
+  margin: 0;
+  color: var(--ink-500);
+  line-height: 1.65;
+}
+
+.assist-label {
+  width: max-content;
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--primary-deep);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.collapse-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.collapse-panel summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 78px;
+  padding: 20px 24px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.collapse-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapse-panel summary strong {
+  display: block;
+  font-size: 21px;
+  line-height: 1.2;
+}
+
+.collapse-panel summary small {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink-500);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.collapse-panel[open] {
+  padding-bottom: 24px;
+}
+
+.collapse-panel[open] > :not(summary) {
+  margin-left: 24px;
+  margin-right: 24px;
+}
+
 .panel-tools {
   display: flex;
   gap: 8px;
@@ -1021,9 +1109,60 @@ textarea {
   font-size: 20px;
 }
 
+.result-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.risk-badge {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  border: 1px solid transparent;
+}
+
+.risk-badge.low {
+  color: var(--primary-deep);
+  background: rgba(46, 145, 116, 0.14);
+  border-color: rgba(46, 145, 116, 0.24);
+}
+
+.risk-badge.consult {
+  color: #73460d;
+  background: rgba(236, 174, 73, 0.22);
+  border-color: rgba(236, 174, 73, 0.35);
+}
+
+.risk-badge.emergency {
+  color: #8c4335;
+  background: rgba(190, 93, 74, 0.16);
+  border-color: rgba(190, 93, 74, 0.28);
+}
+
+.risk-badge.neutral {
+  color: var(--ink-500);
+  background: rgba(255, 255, 255, 0.62);
+  border-color: var(--line);
+}
+
 .result-card p {
   margin: 8px 0 0;
   line-height: 1.75;
+}
+
+.result-reason {
+  margin-top: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(16, 42, 38, 0.1);
+  background: rgba(255, 255, 255, 0.64);
+  padding: 10px 12px;
+  color: var(--ink-700);
+  font-size: 13px;
+  line-height: 1.65;
 }
 
 .callout {
@@ -1086,8 +1225,13 @@ textarea {
 }
 
 .decision-step.warn {
-  border-color: rgba(190, 93, 74, 0.26);
-  background: rgba(190, 93, 74, 0.1);
+  border-color: rgba(236, 174, 73, 0.42);
+  background: rgba(255, 241, 220, 0.82);
+}
+
+.decision-step.danger {
+  border-color: rgba(190, 93, 74, 0.3);
+  background: rgba(190, 93, 74, 0.12);
 }
 
 .footer-note {
