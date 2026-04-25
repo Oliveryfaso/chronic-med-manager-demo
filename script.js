@@ -442,16 +442,28 @@ function syncToastOffset(containerArg) {
 function showToast(text) {
   const container = getToastContainer();
   const node = document.createElement("div");
-  node.className = "user-pill";
-  node.style.background = "rgba(16, 42, 38, 0.88)";
-  node.style.color = "#fff";
-  node.style.marginTop = "8px";
-  node.textContent = text;
+  node.className = "toast-message";
+  node.setAttribute("role", "status");
+
+  const textNode = document.createElement("span");
+  textNode.textContent = text;
+
+  const closeBtn = document.createElement("button");
+  closeBtn.type = "button";
+  closeBtn.className = "toast-close";
+  closeBtn.setAttribute("aria-label", "关闭提示");
+  closeBtn.textContent = "×";
+
+  node.appendChild(textNode);
+  node.appendChild(closeBtn);
   container.appendChild(node);
 
-  setTimeout(() => {
+  const close = () => {
     node.remove();
-  }, 2600);
+  };
+
+  closeBtn.addEventListener("click", close);
+  setTimeout(close, 3200);
 }
 
 function setPressed(el, on) {
@@ -597,7 +609,7 @@ function applyAccessibilityModes() {
   document.body.classList.toggle("high-contrast", accessibility.highContrast);
   document.body.classList.toggle("reduce-motion", accessibility.reducedMotion);
 
-  const simpleHomeEnabled = isDashboardPage() && accessibility.elderMode && accessibility.simpleHome;
+  const simpleHomeEnabled = isDashboardPage() && accessibility.simpleHome;
   document.body.classList.toggle("elder-simple-home", simpleHomeEnabled);
 }
 
@@ -1070,10 +1082,12 @@ function pulseSearchTarget(node) {
 
 function setHomeSearchResult(message, isError = false) {
   const result = document.getElementById("home-search-results");
-  if (!result) return;
-  result.hidden = false;
-  result.classList.toggle("error", isError);
-  result.textContent = message;
+  if (result) {
+    result.hidden = true;
+    result.classList.toggle("error", isError);
+    result.textContent = "";
+  }
+  showToast(message);
 }
 
 function executeHomeSearchItem(item) {
@@ -1114,14 +1128,12 @@ function executeHomeSearchItem(item) {
     }
     setAssistPanelState(true);
     setHomeSearchResult("已开启长辈模式，并打开辅助功能面板。");
-    showToast("已开启长辈模式");
     return;
   }
 
   if (item.type === "action" && item.action === "assist-panel") {
     setAssistPanelState(true);
     setHomeSearchResult("已打开辅助功能面板。");
-    showToast("辅助功能面板已打开");
   }
 }
 
@@ -1132,11 +1144,33 @@ function bindHomeSearch() {
   const result = document.getElementById("home-search-results");
   if (!form || !input || !suggest || !result) return;
 
+  let activeMatches = [];
+
+  const ghost = document.createElement("span");
+  ghost.className = "search-ghost";
+  ghost.setAttribute("aria-hidden", "true");
+  const row = input.closest(".home-search-row");
+  if (row && !row.querySelector(".search-ghost")) {
+    row.insertBefore(ghost, input.nextSibling);
+  }
+
+  const syncGhost = (bestMatch) => {
+    const raw = input.value;
+    const q = raw.trim();
+    if (!q || !bestMatch || !bestMatch.name.startsWith(q) || bestMatch.name === q) {
+      ghost.textContent = "";
+      return;
+    }
+    ghost.textContent = bestMatch.name.slice(q.length);
+    ghost.style.left = `calc(14px + ${raw.length}em)`;
+  };
+
   const renderSuggestions = (list) => {
-    const candidates = list.slice(0, 7);
-    suggest.innerHTML = candidates
-      .map((item) => `<button type="button" class="search-tag" data-search-name="${escapeHtml(item.name)}">${escapeHtml(item.name)}</button>`)
+    activeMatches = list.slice(0, 7);
+    suggest.innerHTML = activeMatches
+      .map((item, index) => `<button type="button" class="search-tag${index === 0 ? " predicted" : ""}" data-search-name="${escapeHtml(item.name)}">${escapeHtml(item.name)}</button>`)
       .join("");
+    syncGhost(activeMatches[0]);
   };
 
   const defaultList = HOME_SEARCH_INDEX.slice(0, 7);
@@ -1147,6 +1181,7 @@ function bindHomeSearch() {
     const q = input.value.trim();
     if (!q) {
       renderSuggestions(defaultList);
+      syncGhost(null);
       result.hidden = true;
       return;
     }
@@ -1154,7 +1189,8 @@ function bindHomeSearch() {
     const matches = findHomeSearchMatches(q);
     if (!matches.length) {
       suggest.innerHTML = '<span class="search-empty">没有匹配结果，可尝试“库存预警”或“漏服补救”</span>';
-      setHomeSearchResult(`没有找到“${q}”，请换一个关键词。`, true);
+      activeMatches = [];
+      syncGhost(null);
       return;
     }
 
@@ -1177,6 +1213,8 @@ function bindHomeSearch() {
       return;
     }
 
+    input.value = matches[0].name;
+    syncGhost(null);
     executeHomeSearchItem(matches[0]);
   });
 
